@@ -53,12 +53,11 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private const val HAND_WIDTH_SECOND = 3f
         private const val TICK_WIDTH = 5f
 
-        private const val HAND_LENGTH_RATIO_HOUR = .5f
-        private const val HAND_LENGTH_RATIO_MINUTE = .75f
-        private const val HAND_LENGTH_RATIO_SECOND = .875f
-        private const val TICK_LENGTH_RATIO = .125f
+        private const val HAND_LENGTH_RATIO_HOUR = 1 / 2f
+        private const val HAND_LENGTH_RATIO_MINUTE = (HAND_LENGTH_RATIO_HOUR + 1) / 2f
+        private const val HAND_LENGTH_RATIO_SECOND = (HAND_LENGTH_RATIO_MINUTE + 1) / 2f
+        private const val TICK_LENGTH_RATIO = (1f - HAND_LENGTH_RATIO_SECOND) / 2f
 
-        private const val CENTER_RADIUS = 15f
         private const val SHADOW_RADIUS = 5f
     }
 
@@ -283,7 +282,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             canvas.rotate(hoursRotation, mCenterX, mCenterY)
             canvas.drawLine(
                     mCenterX,
-                    mCenterY - CENTER_RADIUS,
+                    mCenterY - mTickLength,
                     mCenterX,
                     mCenterY - mHandLengthHour,
                     mPaintHour)
@@ -291,7 +290,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             canvas.rotate(minutesRotation - hoursRotation, mCenterX, mCenterY)
             canvas.drawLine(
                     mCenterX,
-                    mCenterY - CENTER_RADIUS,
+                    mCenterY - mTickLength,
                     mCenterX,
                     mCenterY - mHandLengthMinute,
                     mPaintMinute)
@@ -304,7 +303,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 canvas.rotate(secondsRotation - minutesRotation, mCenterX, mCenterY)
                 canvas.drawLine(
                         mCenterX,
-                        mCenterY - CENTER_RADIUS,
+                        mCenterY - mTickLength,
                         mCenterX,
                         mCenterY - mHandLengthSecond,
                         mPaintSecond)
@@ -313,7 +312,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 //            canvas.drawCircle(
 //                    mCenterX,
 //                    mCenterY,
-//                    CENTER_RADIUS,
+//                    mTickLength,
 //                    mPaintTick)
 
             /* Restore the canvas' original orientation. */
