@@ -45,19 +45,23 @@ import java.util.TimeZone
 class SimpleWatchFaceService : CanvasWatchFaceService() {
 
     companion object {
-        private const val HAND_WIDTH_HOUR = 12f
-        private const val HAND_WIDTH_MINUTE = 6f
-        private const val HAND_WIDTH_SECOND = 4f
-        private const val TICK_WIDTH = 6f
+//        private const val HAND_WIDTH_HOUR = 12f
+//        private const val HAND_WIDTH_MINUTE = 6f
+//        private const val HAND_WIDTH_SECOND = 4f
+//        private const val TICK_WIDTH = 6f
 
         private const val HAND_LENGTH_RATIO_HOUR = 1f / 2f + 1f / 8f
         private const val HAND_LENGTH_RATIO_MINUTE = 1f / 2f + 1f / 4f + 1f / 8f
         private const val HAND_LENGTH_RATIO_SECOND = 1f
         private const val TICK_LENGTH_RATIO = 1f / 16f
         private const val CENTER_GAP_LENGTH_RATIO = 1f / 32f
-
-        private const val SHADOW_RADIUS = 5f
     }
+
+    private val fl: Float
+        get() {
+            val handWidthHour = resources.getDimensionPixelSize(R.dimen.hand_width_hour).toFloat()
+            return handWidthHour
+        }
 
     inner class SimpleWatchFaceEngine : CanvasWatchFaceService.Engine() {
         private val mUpdateTimeHandler = EngineHandler(this)
@@ -74,6 +78,11 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         private var mCenterX = 0f
         private var mCenterY = 0f
+
+        private var mHandWidthHour = 0f
+        private var mHandWidthMinute = 0f
+        private var mHandWidthSecond = 0f
+        private var mShadowRadius = 0f
 
         private var mHandLengthHour = 0f
         private var mHandLengthSecond = 0f
@@ -98,6 +107,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private var mLowBitAmbient = false
         private var mBurnInProtection = false
 
+
         override fun onCreate(holder: SurfaceHolder?) {
             super.onCreate(holder)
 
@@ -113,16 +123,21 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             mColorTick = Color.WHITE
             mColorShadow = Color.BLACK
 
-            mPaintHour.strokeWidth = HAND_WIDTH_HOUR
+            mHandWidthHour = resources.getDimensionPixelSize(R.dimen.hand_width_hour).toFloat()
+            mHandWidthMinute = resources.getDimensionPixelSize(R.dimen.hand_width_minute).toFloat()
+            mHandWidthSecond = resources.getDimensionPixelSize(R.dimen.hand_width_second).toFloat()
+            mShadowRadius = resources.getDimensionPixelSize(R.dimen.shadow_radius).toFloat()
+
+            mPaintHour.strokeWidth = mHandWidthHour
             mPaintHour.strokeCap = Paint.Cap.ROUND
 
-            mPaintMinute.strokeWidth = HAND_WIDTH_MINUTE
+            mPaintMinute.strokeWidth = mHandWidthMinute
             mPaintMinute.strokeCap = Paint.Cap.ROUND
 
-            mPaintSecond.strokeWidth = HAND_WIDTH_SECOND
+            mPaintSecond.strokeWidth = mHandWidthSecond
             mPaintSecond.strokeCap = Paint.Cap.ROUND
 
-            mPaintTick.strokeWidth = TICK_WIDTH
+            mPaintTick.strokeWidth = resources.getDimensionPixelSize(R.dimen.tick_width).toFloat()
 
 //            /* Extract colors from background image to improve watchface style. */
 //            Palette.from(mBackgroundBitmap).generate { palette ->
@@ -189,10 +204,10 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 mPaintSecond.isAntiAlias = true
                 mPaintTick.isAntiAlias = true
 
-                mPaintHour.setShadowLayer(SHADOW_RADIUS, 0f, 0f, mColorShadow)
-                mPaintMinute.setShadowLayer(SHADOW_RADIUS, 0f, 0f, mColorShadow)
-                mPaintSecond.setShadowLayer(SHADOW_RADIUS, 0f, 0f, mColorShadow)
-                mPaintTick.setShadowLayer(SHADOW_RADIUS, 0f, 0f, mColorShadow)
+                mPaintHour.setShadowLayer(mShadowRadius, 0f, 0f, mColorShadow)
+                mPaintMinute.setShadowLayer(mShadowRadius, 0f, 0f, mColorShadow)
+                mPaintSecond.setShadowLayer(mShadowRadius, 0f, 0f, mColorShadow)
+                mPaintTick.setShadowLayer(mShadowRadius, 0f, 0f, mColorShadow)
             }
         }
 
@@ -282,7 +297,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             canvas.rotate(hoursRotation, mCenterX, mCenterY)
             canvas.drawLine(
                     mCenterX,
-                    mCenterY - mCenterGapLength,
+                    mCenterY - mCenterGapLength - mHandWidthHour / 2f,
                     mCenterX,
                     mCenterY - mHandLengthHour,
                     mPaintHour)
@@ -291,7 +306,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             canvas.rotate(minutesRotation - hoursRotation, mCenterX, mCenterY)
             canvas.drawLine(
                     mCenterX,
-                    mCenterY - mCenterGapLength,
+                    mCenterY - mCenterGapLength - mHandWidthMinute / 2f,
                     mCenterX,
                     mCenterY - mHandLengthMinute,
                     mPaintMinute)
@@ -301,9 +316,9 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 canvas.rotate(secondsRotation - minutesRotation, mCenterX, mCenterY)
                 canvas.drawLine(
                         mCenterX,
-                        mCenterY - mCenterGapLength,
+                        mCenterY - mCenterGapLength - mHandWidthMinute / 2f,
                         mCenterX,
-                        mCenterY - mHandLengthSecond + HAND_WIDTH_SECOND / 2f,
+                        mCenterY - mHandLengthSecond + mHandWidthSecond / 2f,
                         mPaintSecond)
             }
 
