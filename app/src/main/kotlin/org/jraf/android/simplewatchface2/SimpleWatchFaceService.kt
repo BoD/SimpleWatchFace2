@@ -41,22 +41,25 @@ import android.view.SurfaceHolder
 import android.widget.Toast
 import java.util.Calendar
 import java.util.TimeZone
-import java.util.concurrent.TimeUnit
 
 class SimpleWatchFaceService : CanvasWatchFaceService() {
 
     companion object {
-        private val UPDATE_PERIOD_MS = TimeUnit.SECONDS.toMillis(1)
+//        private const val HAND_WIDTH_HOUR = 9f
+//        private const val HAND_WIDTH_MINUTE = 5f
+//        private const val HAND_WIDTH_SECOND = 3f
+//        private const val TICK_WIDTH = 5f
 
-        private const val HAND_WIDTH_HOUR = 9f
-        private const val HAND_WIDTH_MINUTE = 5f
-        private const val HAND_WIDTH_SECOND = 3f
-        private const val TICK_WIDTH = 5f
+        private const val HAND_WIDTH_HOUR = 10f
+        private const val HAND_WIDTH_MINUTE = 6f
+        private const val HAND_WIDTH_SECOND = 4f
+        private const val TICK_WIDTH = 6f
 
-        private const val HAND_LENGTH_RATIO_HOUR = 1 / 2f
-        private const val HAND_LENGTH_RATIO_MINUTE = (HAND_LENGTH_RATIO_HOUR + 1) / 2f
-        private const val HAND_LENGTH_RATIO_SECOND = (HAND_LENGTH_RATIO_MINUTE + 1) / 2f
-        private const val TICK_LENGTH_RATIO = (1f - HAND_LENGTH_RATIO_SECOND) / 2f
+        private const val HAND_LENGTH_RATIO_HOUR = 1f / 2f + 1f / 8f
+        private const val HAND_LENGTH_RATIO_MINUTE = 1f / 2f + 1f / 4f + 1f / 8f
+        private const val HAND_LENGTH_RATIO_SECOND = 1f
+        private const val TICK_LENGTH_RATIO = 1f / 16f
+        private const val CENTER_GAP_LENGTH_RATIO = 1f / 16f
 
         private const val SHADOW_RADIUS = 5f
     }
@@ -81,6 +84,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private var mHandLengthSecond = 0f
         private var mHandLengthMinute = 0f
         private var mTickLength = 0f
+        private var mCenterGapLength = 0f
 
         private var mColorHand: Int = 0
         private var mColorHandHighlight: Int = 0
@@ -207,7 +211,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             mHandLengthMinute = mCenterX * HAND_LENGTH_RATIO_MINUTE
             mHandLengthSecond = mCenterX * HAND_LENGTH_RATIO_SECOND
             mTickLength = mCenterX * TICK_LENGTH_RATIO
-
+            mCenterGapLength = mCenterX * CENTER_GAP_LENGTH_RATIO
 
 //            /* Scale loaded background image (more efficient) if surface dimensions change. */
 //            val scale = width / mBackgroundBitmap.width.toFloat()
@@ -235,7 +239,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         override fun onDraw(canvas: Canvas, bounds: Rect) {
             val now = System.currentTimeMillis()
-            mCalendar.timeInMillis = now
+            mCalendar.timeInMillis = now - now % 1000
 
             if (mAmbient) {
                 canvas.drawColor(Color.BLACK)
@@ -279,36 +283,35 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
              */
             canvas.save()
 
+            // Hour
             canvas.rotate(hoursRotation, mCenterX, mCenterY)
             canvas.drawLine(
                     mCenterX,
-                    mCenterY - mTickLength,
+                    mCenterY - mCenterGapLength,
                     mCenterX,
                     mCenterY - mHandLengthHour,
                     mPaintHour)
 
+            // Minute
             canvas.rotate(minutesRotation - hoursRotation, mCenterX, mCenterY)
             canvas.drawLine(
                     mCenterX,
-                    mCenterY - mTickLength,
+                    mCenterY - mCenterGapLength,
                     mCenterX,
                     mCenterY - mHandLengthMinute,
                     mPaintMinute)
 
-            /*
-             * Ensure the "seconds" hand is drawn only when we are in interactive mode.
-             * Otherwise, we only update the watch face once a minute.
-             */
+            // Second
             if (!mAmbient) {
                 canvas.rotate(secondsRotation - minutesRotation, mCenterX, mCenterY)
                 canvas.drawLine(
                         mCenterX,
-                        mCenterY - mTickLength,
+                        mCenterY - mCenterGapLength,
                         mCenterX,
                         mCenterY - mHandLengthSecond,
                         mPaintSecond)
-
             }
+
 //            canvas.drawCircle(
 //                    mCenterX,
 //                    mCenterY,
@@ -377,9 +380,9 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         fun handleUpdateTimeMessage() {
             invalidate()
             if (shouldTimerBeRunning()) {
-                val timeMs = System.currentTimeMillis()
-                val delayMs = UPDATE_PERIOD_MS - timeMs % UPDATE_PERIOD_MS
-                mUpdateTimeHandler.sendEmptyMessageDelayed(0, delayMs)
+                val now = System.currentTimeMillis()
+                val delay = 1000 - now % 1000
+                mUpdateTimeHandler.sendEmptyMessageDelayed(0, delay)
             }
         }
 
