@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/configuration_main_title">
+    <PreferenceScreen
+        android:icon="@drawable/ic_palette_white_24dp"
+        android:title="@string/configuration_colors_title">
+        <Preference
+            android:key="PREF_COLORS_BACKGROUND"
+            android:title="@string/configuration_colors_background" />
+    </PreferenceScreen>
+
+    <Preference
+        android:icon="@drawable/ic_info_white_24dp"
+        android:key="PREF_ABOUT"
+        android:title="@string/configuration_main_about" />
+
+</PreferenceScreen>

@@ -109,4 +109,19 @@ dependencies {
     // Support library
     implementation "com.android.support:support-v4:$versions.supportLibrary"
     implementation "com.android.support:palette-v7:$versions.supportLibrary"
+
+    // JRAF
+    implementation 'com.github.BoD:jraf-android-util:-SNAPSHOT'
+//    implementation 'org.jraf:jraf-android-util:1.0.0'
+    kapt "org.jraf:prefs-compiler:$versions.prefs"
+    implementation "org.jraf:prefs:$versions.prefs"
+    implementation "org.jraf:android-wear-color-picker:$versions.wearColorPicker"
+
+    // Necessary to have Kotlin and dataBinding at the same time
+    kapt "com.android.databinding:compiler:$versions.androidGradlePlugin"  // <- Ici
+}
+
+// Necessary for Prefs to work (see https://kotlinlang.org/docs/reference/kapt.html)
+kapt {
+    correctErrorTypes = true
 }

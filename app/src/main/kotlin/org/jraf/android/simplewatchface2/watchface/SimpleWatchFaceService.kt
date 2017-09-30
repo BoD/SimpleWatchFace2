@@ -22,7 +22,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jraf.android.simplewatchface2
+package org.jraf.android.simplewatchface2.watchface
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -38,6 +38,7 @@ import android.support.wearable.watchface.CanvasWatchFaceService
 import android.support.wearable.watchface.WatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
 import android.view.SurfaceHolder
+import org.jraf.android.simplewatchface2.R
 import java.util.Calendar
 import java.util.TimeZone
 

@@ -22,16 +22,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jraf.android.simplewatchface2
+package org.jraf.android.simplewatchface2.configuration.main
 
-import android.os.Handler
-import android.os.Message
-import java.lang.ref.WeakReference
+import android.app.Activity
+import android.os.Bundle
+import org.jraf.android.simplewatchface2.R
 
-class EngineHandler(reference: SimpleWatchFaceService.SimpleWatchFaceEngine) : Handler() {
-    private val mWeakReference = WeakReference(reference)
-
-    override fun handleMessage(msg: Message) {
-        mWeakReference.get()?.handleUpdateTimeMessage()
+class MainConfigurationActivity : Activity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.configuration_main_activity)
     }
 }

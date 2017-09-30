@@ -22,18 +22,26 @@
             android:value="true" />
 
         <service
-            android:name=".SimpleWatchFaceService"
+            android:name=".watchface.SimpleWatchFaceService"
             android:label="@string/my_analog_name"
             android:permission="android.permission.BIND_WALLPAPER">
+
             <meta-data
                 android:name="android.service.wallpaper"
                 android:resource="@xml/watch_face" />
+
             <meta-data
                 android:name="com.google.android.wearable.watchface.preview"
                 android:resource="@drawable/preview_analog" />
+
             <meta-data
                 android:name="com.google.android.wearable.watchface.preview_circular"
                 android:resource="@drawable/preview_analog" />
+
+            <!-- Configuration activity -->
+            <meta-data
+                android:name="com.google.android.wearable.watchface.wearableConfigurationAction"
+                android:value="org.jraf.android.simplewatchface2.ACTION_CONFIGURATION" />
 
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />
@@ -41,6 +49,20 @@
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
             </intent-filter>
         </service>
+
+        <!-- Main settings -->
+        <activity
+            android:name=".configuration.main.MainConfigurationActivity">
+            <intent-filter>
+                <action android:name="org.jraf.android.simplewatchface2.ACTION_CONFIGURATION" />
+
+                <category android:name="com.google.android.wearable.watchface.category.WEARABLE_CONFIGURATION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- About -->
+        <activity android:name="org.jraf.android.util.about.WearAboutActivity" />
 
     </application>
 
