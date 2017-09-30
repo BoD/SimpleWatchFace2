@@ -38,30 +38,18 @@ import android.support.wearable.watchface.CanvasWatchFaceService
 import android.support.wearable.watchface.WatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
 import android.view.SurfaceHolder
-import android.widget.Toast
 import java.util.Calendar
 import java.util.TimeZone
 
 class SimpleWatchFaceService : CanvasWatchFaceService() {
 
     companion object {
-//        private const val HAND_WIDTH_HOUR = 12f
-//        private const val HAND_WIDTH_MINUTE = 6f
-//        private const val HAND_WIDTH_SECOND = 4f
-//        private const val TICK_WIDTH = 6f
-
         private const val HAND_LENGTH_RATIO_HOUR = 1f / 2f + 1f / 8f
         private const val HAND_LENGTH_RATIO_MINUTE = 1f / 2f + 1f / 4f + 1f / 8f
         private const val HAND_LENGTH_RATIO_SECOND = 1f
         private const val TICK_LENGTH_RATIO = 1f / 16f
         private const val CENTER_GAP_LENGTH_RATIO = 1f / 32f
     }
-
-    private val fl: Float
-        get() {
-            val handWidthHour = resources.getDimensionPixelSize(R.dimen.hand_width_hour).toFloat()
-            return handWidthHour
-        }
 
     inner class SimpleWatchFaceEngine : CanvasWatchFaceService.Engine() {
         private val mUpdateTimeHandler = EngineHandler(this)
@@ -232,17 +220,10 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         }
 
-        /**
-         * Captures tap event (and tap type). The [WatchFaceService.TAP_TYPE_TAP] case can be
-         * used for implementing specific logic to handle the gesture.
-         */
         override fun onTapCommand(tapType: Int, x: Int, y: Int, eventTime: Long) {
             when (tapType) {
-                WatchFaceService.TAP_TYPE_TAP ->
-                    // The user has completed the tap gesture.
-                    // TODO: Add code to handle the tap gesture.
-                    Toast.makeText(this@SimpleWatchFaceService, R.string.message, Toast.LENGTH_SHORT)
-                            .show()
+                WatchFaceService.TAP_TYPE_TAP -> {
+                }
             }
             invalidate()
         }
@@ -258,11 +239,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 canvas.drawColor(0xFF330000.toInt())
             }
 
-            /*
-             * Draw ticks. Usually you will want to bake this directly into the photo, but in
-             * cases where you want to allow users to select their own photos, this dynamically
-             * creates them on top of the photo.
-             */
+            // Ticks
             val innerTickRadius = mCenterX - mTickLength
             val outerTickRadius = mCenterX
             for (tickIndex in 0..11) {
@@ -271,26 +248,21 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 val innerY = (-Math.cos(tickRot.toDouble())).toFloat() * innerTickRadius
                 val outerX = Math.sin(tickRot.toDouble()).toFloat() * outerTickRadius
                 val outerY = (-Math.cos(tickRot.toDouble())).toFloat() * outerTickRadius
-                canvas.drawLine(mCenterX + innerX, mCenterY + innerY,
-                        mCenterX + outerX, mCenterY + outerY, mPaintTick)
+                canvas.drawLine(mCenterX + innerX,
+                        mCenterY + innerY,
+                        mCenterX + outerX,
+                        mCenterY + outerY,
+                        mPaintTick)
             }
 
-            /*
-             * These calculations reflect the rotation in degrees per unit of time, e.g.,
-             * 360 / 60 = 6 and 360 / 12 = 30.
-             */
-            val seconds = mCalendar.get(Calendar.SECOND) + mCalendar.get(Calendar.MILLISECOND) / 1000f
+            val seconds = mCalendar[Calendar.SECOND]
             val secondsRotation = seconds * 6f
 
-//            val minutesRotation = mCalendar.get(Calendar.MINUTE) * 6f
-            val minutesRotation = mCalendar.get(Calendar.MINUTE) * 6f + (seconds / 60f) * 6f
+            val minutes = mCalendar[Calendar.MINUTE]
+            val minutesRotation = minutes * 6f + (seconds / 60f) * 6f
 
-            val hourHandOffset = mCalendar.get(Calendar.MINUTE) / 2f
-            val hoursRotation = mCalendar.get(Calendar.HOUR) * 30 + hourHandOffset
+            val hoursRotation = mCalendar[Calendar.HOUR] * 30f + (minutes / 60f) * 30f
 
-            /*
-             * Save the canvas state before we can begin to rotate it.
-             */
             canvas.save()
 
             // Hour
@@ -328,9 +300,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 //                    mTickLength,
 //                    mPaintTick)
 
-            /* Restore the canvas' original orientation. */
             canvas.restore()
-
         }
 
         override fun onVisibilityChanged(visible: Boolean) {
@@ -338,37 +308,28 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
             if (visible) {
                 registerReceiver()
-                /* Update time zone in case it changed while we weren't visible. */
                 mCalendar.timeZone = TimeZone.getDefault()
                 invalidate()
             } else {
                 unregisterReceiver()
             }
 
-            /* Check and trigger whether or not timer should be running (only in active mode). */
             updateTimer()
         }
 
         private fun registerReceiver() {
-            if (mTimeZoneReceiverRegistered) {
-                return
-            }
+            if (mTimeZoneReceiverRegistered) return
             mTimeZoneReceiverRegistered = true
             val filter = IntentFilter(Intent.ACTION_TIMEZONE_CHANGED)
             registerReceiver(mTimeZoneReceiver, filter)
         }
 
         private fun unregisterReceiver() {
-            if (!mTimeZoneReceiverRegistered) {
-                return
-            }
+            if (!mTimeZoneReceiverRegistered) return
             mTimeZoneReceiverRegistered = false
             unregisterReceiver(mTimeZoneReceiver)
         }
 
-        /**
-         * Starts/stops the [.mUpdateTimeHandler] timer based on the state of the watch face.
-         */
         private fun updateTimer() {
             mUpdateTimeHandler.removeCallbacksAndMessages(null)
             if (shouldTimerBeRunning()) {
@@ -376,10 +337,6 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             }
         }
 
-        /**
-         * Returns whether the [.mUpdateTimeHandler] timer should be running. The timer
-         * should only run in active mode.
-         */
         private fun shouldTimerBeRunning(): Boolean {
             return isVisible && !mAmbient
         }
