@@ -45,12 +45,7 @@ import java.util.TimeZone
 class SimpleWatchFaceService : CanvasWatchFaceService() {
 
     companion object {
-//        private const val HAND_WIDTH_HOUR = 9f
-//        private const val HAND_WIDTH_MINUTE = 5f
-//        private const val HAND_WIDTH_SECOND = 3f
-//        private const val TICK_WIDTH = 5f
-
-        private const val HAND_WIDTH_HOUR = 10f
+        private const val HAND_WIDTH_HOUR = 12f
         private const val HAND_WIDTH_MINUTE = 6f
         private const val HAND_WIDTH_SECOND = 4f
         private const val TICK_WIDTH = 6f
@@ -59,7 +54,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private const val HAND_LENGTH_RATIO_MINUTE = 1f / 2f + 1f / 4f + 1f / 8f
         private const val HAND_LENGTH_RATIO_SECOND = 1f
         private const val TICK_LENGTH_RATIO = 1f / 16f
-        private const val CENTER_GAP_LENGTH_RATIO = 1f / 16f
+        private const val CENTER_GAP_LENGTH_RATIO = 1f / 32f
 
         private const val SHADOW_RADIUS = 5f
     }
@@ -308,7 +303,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                         mCenterX,
                         mCenterY - mCenterGapLength,
                         mCenterX,
-                        mCenterY - mHandLengthSecond,
+                        mCenterY - mHandLengthSecond + HAND_WIDTH_SECOND / 2f,
                         mPaintSecond)
             }
 
