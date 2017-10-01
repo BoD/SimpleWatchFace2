@@ -5,14 +5,32 @@
     <PreferenceScreen
         android:icon="@drawable/ic_palette_white_24dp"
         android:title="@string/configuration_colors_title">
+
         <Preference
-            android:key="PREF_COLORS_BACKGROUND"
+            android:key="colorBackground"
             android:title="@string/configuration_colors_background" />
+
+        <Preference
+            android:key="colorHandHour"
+            android:title="@string/configuration_colors_handHour" />
+
+        <Preference
+            android:key="colorHandMinute"
+            android:title="@string/configuration_colors_handMinute" />
+
+        <Preference
+            android:key="colorHandSecond"
+            android:title="@string/configuration_colors_handSecond" />
+
+        <Preference
+            android:key="colorTicks"
+            android:title="@string/configuration_colors_ticks" />
+
     </PreferenceScreen>
 
     <Preference
         android:icon="@drawable/ic_info_white_24dp"
-        android:key="PREF_ABOUT"
+        android:key="about"
         android:title="@string/configuration_main_about" />
 
 </PreferenceScreen>

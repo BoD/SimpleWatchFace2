@@ -24,24 +24,36 @@
  */
 package org.jraf.android.simplewatchface2.configuration.main
 
+import android.app.Activity
+import android.content.Intent
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.preference.PreferenceFragment
+import org.jraf.android.androidwearcolorpicker.app.ColorPickActivity
 import org.jraf.android.simplewatchface2.BuildConfig
 import org.jraf.android.simplewatchface2.R
+import org.jraf.android.simplewatchface2.prefs.ConfigurationConstants
+import org.jraf.android.simplewatchface2.prefs.ConfigurationPrefs
 import org.jraf.android.util.about.AboutActivityIntentBuilder
 
 class MainConfigurationFragment : PreferenceFragment() {
+    private val mPrefs by lazy { ConfigurationPrefs.get(context) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         addPreferencesFromResource(R.xml.configuration_main)
 
-        // Refresh
-        findPreference("PREF_COLORS_BACKGROUND").setOnPreferenceClickListener { _ ->
-            true
-        }
+        updateColorPreferences()
+
+        // Colors
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_BACKGROUND, mPrefs.colorBackground)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_HOUR, mPrefs.colorHandHour)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_MINUTE, mPrefs.colorHandMinute)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_SECOND, mPrefs.colorHandSecond)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_TICKS, mPrefs.colorTicks)
 
         // About
-        findPreference("PREF_ABOUT").setOnPreferenceClickListener { _ ->
+        findPreference("about").setOnPreferenceClickListener { _ ->
             val builder = AboutActivityIntentBuilder()
             builder.setAppName(getString(R.string.app_name))
             builder.setBuildDate(BuildConfig.BUILD_DATE)
@@ -57,4 +69,50 @@ class MainConfigurationFragment : PreferenceFragment() {
             true
         }
     }
+
+    private fun setColorPrefClickListener(prefKey: String, color: Int) {
+        findPreference(prefKey).setOnPreferenceClickListener { _ ->
+            val intent = ColorPickActivity.IntentBuilder().oldColor(color).build(context)
+            startActivityForResult(intent, prefKey.asRequestCode())
+            true
+        }
+    }
+
+    private fun updateColorPreferences() {
+        updatePrefColor(ConfigurationConstants.KEY_COLOR_BACKGROUND, mPrefs.colorBackground)
+        updatePrefColor(ConfigurationConstants.KEY_COLOR_HAND_HOUR, mPrefs.colorHandHour)
+        updatePrefColor(ConfigurationConstants.KEY_COLOR_HAND_MINUTE, mPrefs.colorHandMinute)
+        updatePrefColor(ConfigurationConstants.KEY_COLOR_HAND_SECOND, mPrefs.colorHandSecond)
+        updatePrefColor(ConfigurationConstants.KEY_COLOR_TICKS, mPrefs.colorTicks)
+    }
+
+    private fun updatePrefColor(prefKey: String, color: Int) {
+        findPreference(prefKey).icon = (resources.getDrawable(R.drawable.configuration_list_item_color_indicator, null).mutate() as GradientDrawable).apply {
+            setColor(color)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode != Activity.RESULT_OK) return
+
+        val pickedColor = ColorPickActivity.getPickedColor(data)
+        when (requestCode) {
+            ConfigurationConstants.KEY_COLOR_BACKGROUND.asRequestCode() -> mPrefs.colorBackground = pickedColor
+            ConfigurationConstants.KEY_COLOR_HAND_HOUR.asRequestCode() -> mPrefs.colorHandHour = pickedColor
+            ConfigurationConstants.KEY_COLOR_HAND_MINUTE.asRequestCode() -> mPrefs.colorHandMinute = pickedColor
+            ConfigurationConstants.KEY_COLOR_HAND_SECOND.asRequestCode() -> mPrefs.colorHandSecond = pickedColor
+            ConfigurationConstants.KEY_COLOR_TICKS.asRequestCode() -> mPrefs.colorTicks = pickedColor
+        }
+        updateColorPreferences()
+    }
+
+    private val mRequestCodes: MutableList<Int> = mutableListOf()
+
+    private fun Any.asRequestCode(): Int {
+        val hashCode = hashCode()
+        if (!mRequestCodes.contains(hashCode)) mRequestCodes.add(hashCode)
+        return mRequestCodes.indexOf(hashCode)
+    }
 }
+

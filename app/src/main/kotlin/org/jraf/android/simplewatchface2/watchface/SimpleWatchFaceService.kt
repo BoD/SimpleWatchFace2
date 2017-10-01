@@ -28,7 +28,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Bitmap
+import android.content.SharedPreferences
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -39,6 +39,7 @@ import android.support.wearable.watchface.WatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
 import android.view.SurfaceHolder
 import org.jraf.android.simplewatchface2.R
+import org.jraf.android.simplewatchface2.prefs.ConfigurationPrefs
 import java.util.Calendar
 import java.util.TimeZone
 
@@ -53,6 +54,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
     }
 
     inner class SimpleWatchFaceEngine : CanvasWatchFaceService.Engine() {
+        private val mPrefs by lazy { ConfigurationPrefs.get(this@SimpleWatchFaceService) }
+
         private val mUpdateTimeHandler = EngineHandler(this)
 
         private var mCalendar: Calendar = Calendar.getInstance()
@@ -79,23 +82,21 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private var mTickLength = 0f
         private var mCenterGapLength = 0f
 
-        private var mColorHand: Int = 0
-        private var mColorHandHighlight: Int = 0
+        private var mColorBackground: Int = 0
+        private var mColorHandHour: Int = 0
+        private var mColorHandMinute: Int = 0
+        private var mColorHandSecond: Int = 0
         private var mColorTick: Int = 0
         private var mColorShadow: Int = 0
 
-        private val mPaintBackground = Paint()
         private val mPaintHour = Paint()
         private val mPaintMinute = Paint()
         private val mPaintSecond = Paint()
         private val mPaintTick = Paint()
 
-        private var mBackgroundBitmap: Bitmap? = null
-
         private var mAmbient = false
         private var mLowBitAmbient = false
         private var mBurnInProtection = false
-
 
         override fun onCreate(holder: SurfaceHolder?) {
             super.onCreate(holder)
@@ -104,13 +105,11 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                     .setAcceptsTapEvents(true)
                     .build())
 
-            mPaintBackground.color = Color.BLACK
+//            mPaintBackground.color = Color.BLACK
 //            mBackgroundBitmap = BitmapFactory.decodeResource(resources, R.drawable.bg)
 
-            mColorHand = Color.WHITE
-            mColorHandHighlight = Color.RED
-            mColorTick = Color.WHITE
             mColorShadow = Color.BLACK
+            loadColorsFromPrefs()
 
             mHandWidthHour = resources.getDimensionPixelSize(R.dimen.hand_width_hour).toFloat()
             mHandWidthMinute = resources.getDimensionPixelSize(R.dimen.hand_width_minute).toFloat()
@@ -139,10 +138,20 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 //            }
 
             updateWatchHandStyle()
+            mPrefs.registerOnSharedPreferenceChangeListener(mOnPrefsChanged)
+        }
+
+        private fun loadColorsFromPrefs() {
+            mColorBackground = mPrefs.colorBackground
+            mColorHandHour = mPrefs.colorHandHour
+            mColorHandMinute = mPrefs.colorHandMinute
+            mColorHandSecond = mPrefs.colorHandSecond
+            mColorTick = mPrefs.colorTicks
         }
 
         override fun onDestroy() {
             mUpdateTimeHandler.removeCallbacksAndMessages(null)
+            mPrefs.unregisterOnSharedPreferenceChangeListener(mOnPrefsChanged)
             super.onDestroy()
         }
 
@@ -183,10 +192,10 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 mPaintSecond.clearShadowLayer()
                 mPaintTick.clearShadowLayer()
             } else {
-                mPaintHour.color = mColorHand
-                mPaintMinute.color = mColorHand
-                mPaintSecond.color = mColorHandHighlight
-                mPaintTick.color = mColorHand
+                mPaintHour.color = mColorHandHour
+                mPaintMinute.color = mColorHandMinute
+                mPaintSecond.color = mColorHandSecond
+                mPaintTick.color = mColorTick
 
                 mPaintHour.isAntiAlias = true
                 mPaintMinute.isAntiAlias = true
@@ -237,7 +246,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 canvas.drawColor(Color.BLACK)
             } else {
 //                canvas.drawBitmap(mBackgroundBitmap, 0f, 0f, mPaintBackground)
-                canvas.drawColor(0xFF330000.toInt())
+                canvas.drawColor(mColorBackground)
             }
 
             // Ticks
@@ -354,6 +363,10 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             }
         }
 
+        private val mOnPrefsChanged: SharedPreferences.OnSharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
+            loadColorsFromPrefs()
+            updateWatchHandStyle()
+        }
     }
 
     override fun onCreateEngine() = SimpleWatchFaceEngine()

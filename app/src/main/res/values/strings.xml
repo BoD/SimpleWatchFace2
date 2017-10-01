@@ -18,5 +18,9 @@
     <string name="about_shareText_subject">Checkout out this app!</string>
     <string name="about_shareText_body">This app lists movies showing at your favorite theater, on your watch.\nCheck it out here:\nhttp://play.google.com/store/apps/details?id=%s</string>
     <string name="configuration_main_about">About</string>
+    <string name="configuration_colors_handHour">Hour hand</string>
+    <string name="configuration_colors_handMinute">Minute hand</string>
+    <string name="configuration_colors_handSecond">Second hand</string>
+    <string name="configuration_colors_ticks">Ticks</string>
 
 </resources>

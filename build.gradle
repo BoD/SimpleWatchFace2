@@ -31,7 +31,7 @@ buildscript {
         androidWearable = '2.0.5'
         prefs = '1.2.2'
         androidCrop = '1.0.1'
-        wearColorPicker = '1.0.1'
+        wearColorPicker = '1.0.2'
     }
 
     repositories {
