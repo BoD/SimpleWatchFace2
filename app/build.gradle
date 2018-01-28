@@ -116,7 +116,6 @@ dependencies {
 //    implementation 'org.jraf:jraf-android-util:1.0.0'
     kapt "org.jraf:prefs-compiler:$versions.prefs"
     implementation "org.jraf:prefs:$versions.prefs"
-    implementation "org.jraf:android-wear-color-picker:$versions.wearColorPicker"
 
     // Necessary to have Kotlin and dataBinding at the same time
     kapt "com.android.databinding:compiler:$versions.androidGradlePlugin"  // <- Ici
