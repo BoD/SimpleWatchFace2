@@ -49,7 +49,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private const val HAND_LENGTH_RATIO_HOUR = 1f / 2f + 1f / 8f
         private const val HAND_LENGTH_RATIO_MINUTE = 1f / 2f + 1f / 4f + 1f / 8f
         private const val HAND_LENGTH_RATIO_SECOND = 1f
-        private const val TICK_LENGTH_RATIO = 1f / 16f
+        private const val MAJOR_TICK_LENGTH_RATIO = 1f / 7f
+        private const val MINOR_TICK_LENGTH_RATIO = 1f / 16f
         private const val CENTER_GAP_LENGTH_RATIO = 1f / 32f
     }
 
@@ -79,7 +80,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private var mHandLengthHour = 0f
         private var mHandLengthSecond = 0f
         private var mHandLengthMinute = 0f
-        private var mTickLength = 0f
+        private var mMinorTickLength = 0f
+        private var mMajorTickLength = 0f
         private var mCenterGapLength = 0f
 
         private var mColorBackground: Int = 0
@@ -218,7 +220,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             mHandLengthHour = mCenterX * HAND_LENGTH_RATIO_HOUR
             mHandLengthMinute = mCenterX * HAND_LENGTH_RATIO_MINUTE
             mHandLengthSecond = mCenterX * HAND_LENGTH_RATIO_SECOND
-            mTickLength = mCenterX * TICK_LENGTH_RATIO
+            mMinorTickLength = mCenterX * MINOR_TICK_LENGTH_RATIO
+            mMajorTickLength = mCenterX * MAJOR_TICK_LENGTH_RATIO
             mCenterGapLength = mCenterX * CENTER_GAP_LENGTH_RATIO
 
 //            /* Scale loaded background image (more efficient) if surface dimensions change. */
@@ -250,9 +253,11 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             }
 
             // Ticks
-            val innerTickRadius = mCenterX - mTickLength
+            val innerMinorTickRadius = mCenterX - mMinorTickLength
+            val innerMajorTickRadius = mCenterX - mMajorTickLength
             val outerTickRadius = mCenterX
             for (tickIndex in 0..11) {
+                val innerTickRadius = if (tickIndex % 3 == 0) innerMajorTickRadius else innerMinorTickRadius
                 val tickRot = (tickIndex.toDouble() * Math.PI * 2.0 / 12).toFloat()
                 val innerX = Math.sin(tickRot.toDouble()).toFloat() * innerTickRadius
                 val innerY = (-Math.cos(tickRot.toDouble())).toFloat() * innerTickRadius
@@ -307,7 +312,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 //            canvas.drawCircle(
 //                    mCenterX,
 //                    mCenterY,
-//                    mTickLength,
+//                    mMinorTickLength,
 //                    mPaintTick)
 
             canvas.restore()
