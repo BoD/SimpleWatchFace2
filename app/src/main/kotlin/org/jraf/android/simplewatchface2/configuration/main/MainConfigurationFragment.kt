@@ -29,9 +29,9 @@ import android.content.Intent
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.preference.PreferenceFragment
-import org.jraf.android.androidwearcolorpicker.app.ColorPickActivity
 import org.jraf.android.simplewatchface2.BuildConfig
 import org.jraf.android.simplewatchface2.R
+import org.jraf.android.simplewatchface2.configuration.main.colorpick.ColorPickActivity
 import org.jraf.android.simplewatchface2.prefs.ConfigurationConstants
 import org.jraf.android.simplewatchface2.prefs.ConfigurationPrefs
 import org.jraf.android.util.about.AboutActivityIntentBuilder
@@ -100,7 +100,7 @@ class MainConfigurationFragment : PreferenceFragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode != Activity.RESULT_OK) return
 
-        val pickedColor = ColorPickActivity.getPickedColor(data)
+        val pickedColor = data?.getIntExtra(ColorPickActivity.EXTRA_RESULT, 0)
         when (requestCode) {
             ConfigurationConstants.KEY_COLOR_BACKGROUND.asRequestCode() -> mPrefs.colorBackground = pickedColor
             ConfigurationConstants.KEY_COLOR_HAND_HOUR.asRequestCode() -> mPrefs.colorHandHour = pickedColor
