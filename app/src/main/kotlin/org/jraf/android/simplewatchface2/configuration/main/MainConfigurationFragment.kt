@@ -72,7 +72,11 @@ class MainConfigurationFragment : PreferenceFragment() {
 
     private fun setColorPrefClickListener(prefKey: String, color: Int) {
         findPreference(prefKey).setOnPreferenceClickListener { _ ->
-            val intent = ColorPickActivity.IntentBuilder().oldColor(color).build(context)
+            //            val intent = ColorPickActivity.IntentBuilder().oldColor(color).build(context)
+            val intent = Intent(
+                context,
+                org.jraf.android.simplewatchface2.configuration.main.colorpick.ColorPickActivity::class.java
+            )
             startActivityForResult(intent, prefKey.asRequestCode())
             true
         }

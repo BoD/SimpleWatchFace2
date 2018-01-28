@@ -104,6 +104,7 @@ dependencies {
     //  Wear
     implementation "com.google.android.support:wearable:$versions.androidWearable"
     compileOnly "com.google.android.wearable:wearable:$versions.androidWearable"
+    implementation "com.android.support:wear:$versions.supportLibrary"
     implementation "com.google.android.gms:play-services-wearable:$versions.playServices"
 
     // Support library

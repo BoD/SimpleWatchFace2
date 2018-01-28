@@ -108,7 +108,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 //            mPaintBackground.color = Color.BLACK
 //            mBackgroundBitmap = BitmapFactory.decodeResource(resources, R.drawable.bg)
 
-            mColorShadow = Color.BLACK
+            mColorShadow = 0x80000000.toInt()
             loadColorsFromPrefs()
 
             mHandWidthHour = resources.getDimensionPixelSize(R.dimen.hand_width_hour).toFloat()
