@@ -29,9 +29,9 @@ import android.os.Message
 import java.lang.ref.WeakReference
 
 class EngineHandler(reference: SimpleWatchFaceService.SimpleWatchFaceEngine) : Handler() {
-    private val mWeakReference = WeakReference(reference)
+    private val weakReference = WeakReference(reference)
 
     override fun handleMessage(msg: Message) {
-        mWeakReference.get()?.handleUpdateTimeMessage()
+        weakReference.get()?.handleUpdateTimeMessage()
     }
 }

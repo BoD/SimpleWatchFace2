@@ -4,15 +4,17 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'com.getkeepsafe.dexcount'
 
 android {
-    compileSdkVersion versions.compileSdk
-    buildToolsVersion versions.buildTools
+    compileSdkVersion versions.build.compileSdk
+    buildToolsVersion versions.build.tools
 
     defaultConfig {
-        applicationId "org.jraf.android.simplewatchface2"
-        minSdkVersion 25
-        targetSdkVersion versions.targetSdk
+        applicationId 'org.jraf.android.simplewatchface2'
+        minSdkVersion versions.build.minSdk
+        targetSdkVersion versions.build.targetSdk
         versionCode buildNumber
         versionName buildProperties.versionName
+
+        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
 
         // For now we enable strict mode for all the configs
         buildConfigField 'boolean', 'STRICT_MODE', 'true'
@@ -99,7 +101,7 @@ android.applicationVariants.all { variant ->
 
 dependencies {
     // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$versions.kotlin"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
 
     //  Wear
     implementation "com.google.android.support:wearable:$versions.androidWearable"
@@ -112,13 +114,11 @@ dependencies {
     implementation "com.android.support:palette-v7:$versions.supportLibrary"
 
     // JRAF
-    implementation 'com.github.BoD:jraf-android-util:-SNAPSHOT'
-//    implementation 'org.jraf:jraf-android-util:1.0.0'
     kapt "org.jraf:prefs-compiler:$versions.prefs"
     implementation "org.jraf:prefs:$versions.prefs"
-
-    // Necessary to have Kotlin and dataBinding at the same time
-    kapt "com.android.databinding:compiler:$versions.androidGradlePlugin"  // <- Ici
+    implementation 'com.github.BoD:jraf-android-util:-SNAPSHOT'
+//    implementation 'org.jraf:jraf-android-util:1.0.0'
+    implementation "org.jraf:android-wear-color-picker:$versions.wearColorPicker"
 }
 
 // Necessary for Prefs to work (see https://kotlinlang.org/docs/reference/kapt.html)

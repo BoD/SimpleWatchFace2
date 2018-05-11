@@ -55,50 +55,50 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
     }
 
     inner class SimpleWatchFaceEngine : CanvasWatchFaceService.Engine() {
-        private val mPrefs by lazy { ConfigurationPrefs.get(this@SimpleWatchFaceService) }
+        private val prefs by lazy { ConfigurationPrefs.get(this@SimpleWatchFaceService) }
 
-        private val mUpdateTimeHandler = EngineHandler(this)
+        private val updateTimeHandler = EngineHandler(this)
 
-        private var mCalendar: Calendar = Calendar.getInstance()
+        private var calendar: Calendar = Calendar.getInstance()
 
-        private val mTimeZoneReceiver = object : BroadcastReceiver() {
+        private val timeZoneReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                mCalendar.timeZone = TimeZone.getDefault()
+                calendar.timeZone = TimeZone.getDefault()
                 invalidate()
             }
         }
-        private var mTimeZoneReceiverRegistered = false
+        private var timeZoneReceiverRegistered = false
 
-        private var mCenterX = 0f
-        private var mCenterY = 0f
+        private var centerX = 0f
+        private var centerY = 0f
 
-        private var mHandWidthHour = 0f
-        private var mHandWidthMinute = 0f
-        private var mHandWidthSecond = 0f
-        private var mShadowRadius = 0f
+        private var handWidthHour = 0f
+        private var handWidthMinute = 0f
+        private var handWidthSecond = 0f
+        private var shadowRadius = 0f
 
-        private var mHandLengthHour = 0f
-        private var mHandLengthSecond = 0f
-        private var mHandLengthMinute = 0f
-        private var mMinorTickLength = 0f
-        private var mMajorTickLength = 0f
-        private var mCenterGapLength = 0f
+        private var handLengthHour = 0f
+        private var handLengthSecond = 0f
+        private var handLengthMinute = 0f
+        private var minorTickLength = 0f
+        private var majorTickLength = 0f
+        private var centerGapLength = 0f
 
-        private var mColorBackground: Int = 0
-        private var mColorHandHour: Int = 0
-        private var mColorHandMinute: Int = 0
-        private var mColorHandSecond: Int = 0
-        private var mColorTick: Int = 0
-        private var mColorShadow: Int = 0
+        private var colorBackground: Int = 0
+        private var colorHandHour: Int = 0
+        private var colorHandMinute: Int = 0
+        private var colorHandSecond: Int = 0
+        private var colorTick: Int = 0
+        private var colorShadow: Int = 0
 
-        private val mPaintHour = Paint()
-        private val mPaintMinute = Paint()
-        private val mPaintSecond = Paint()
-        private val mPaintTick = Paint()
+        private val paintHour = Paint()
+        private val paintMinute = Paint()
+        private val paintSecond = Paint()
+        private val paintTick = Paint()
 
-        private var mAmbient = false
-        private var mLowBitAmbient = false
-        private var mBurnInProtection = false
+        private var ambient = false
+        private var lowBitAmbient = false
+        private var burnInProtection = false
 
         override fun onCreate(holder: SurfaceHolder?) {
             super.onCreate(holder)
@@ -110,57 +110,57 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 //            mPaintBackground.color = Color.BLACK
 //            mBackgroundBitmap = BitmapFactory.decodeResource(resources, R.drawable.bg)
 
-            mColorShadow = 0x80000000.toInt()
+            colorShadow = 0x80000000.toInt()
             loadColorsFromPrefs()
 
-            mHandWidthHour = resources.getDimensionPixelSize(R.dimen.hand_width_hour).toFloat()
-            mHandWidthMinute = resources.getDimensionPixelSize(R.dimen.hand_width_minute).toFloat()
-            mHandWidthSecond = resources.getDimensionPixelSize(R.dimen.hand_width_second).toFloat()
-            mShadowRadius = resources.getDimensionPixelSize(R.dimen.shadow_radius).toFloat()
+            handWidthHour = resources.getDimensionPixelSize(R.dimen.hand_width_hour).toFloat()
+            handWidthMinute = resources.getDimensionPixelSize(R.dimen.hand_width_minute).toFloat()
+            handWidthSecond = resources.getDimensionPixelSize(R.dimen.hand_width_second).toFloat()
+            shadowRadius = resources.getDimensionPixelSize(R.dimen.shadow_radius).toFloat()
 
-            mPaintHour.strokeWidth = mHandWidthHour
-            mPaintHour.strokeCap = Paint.Cap.ROUND
+            paintHour.strokeWidth = handWidthHour
+            paintHour.strokeCap = Paint.Cap.ROUND
 
-            mPaintMinute.strokeWidth = mHandWidthMinute
-            mPaintMinute.strokeCap = Paint.Cap.ROUND
+            paintMinute.strokeWidth = handWidthMinute
+            paintMinute.strokeCap = Paint.Cap.ROUND
 
-            mPaintSecond.strokeWidth = mHandWidthSecond
-            mPaintSecond.strokeCap = Paint.Cap.ROUND
+            paintSecond.strokeWidth = handWidthSecond
+            paintSecond.strokeCap = Paint.Cap.ROUND
 
-            mPaintTick.strokeWidth = resources.getDimensionPixelSize(R.dimen.tick_width).toFloat()
+            paintTick.strokeWidth = resources.getDimensionPixelSize(R.dimen.tick_width).toFloat()
 
 //            /* Extract colors from background image to improve watchface style. */
 //            Palette.from(mBackgroundBitmap).generate { palette ->
 //                if (palette != null) {
 //                    mColorHandHighlight = palette.getVibrantColor(Color.RED)
 //                    mColorHand = palette.getLightVibrantColor(Color.WHITE)
-//                    mColorShadow = palette.getDarkMutedColor(Color.BLACK)
+//                    colorShadow = palette.getDarkMutedColor(Color.BLACK)
 //                    updateWatchHandStyle()
 //                }
 //            }
 
             updateWatchHandStyle()
-            mPrefs.registerOnSharedPreferenceChangeListener(mOnPrefsChanged)
+            prefs.registerOnSharedPreferenceChangeListener(mOnPrefsChanged)
         }
 
         private fun loadColorsFromPrefs() {
-            mColorBackground = mPrefs.colorBackground
-            mColorHandHour = mPrefs.colorHandHour
-            mColorHandMinute = mPrefs.colorHandMinute
-            mColorHandSecond = mPrefs.colorHandSecond
-            mColorTick = mPrefs.colorTicks
+            colorBackground = prefs.colorBackground
+            colorHandHour = prefs.colorHandHour
+            colorHandMinute = prefs.colorHandMinute
+            colorHandSecond = prefs.colorHandSecond
+            colorTick = prefs.colorTicks
         }
 
         override fun onDestroy() {
-            mUpdateTimeHandler.removeCallbacksAndMessages(null)
-            mPrefs.unregisterOnSharedPreferenceChangeListener(mOnPrefsChanged)
+            updateTimeHandler.removeCallbacksAndMessages(null)
+            prefs.unregisterOnSharedPreferenceChangeListener(mOnPrefsChanged)
             super.onDestroy()
         }
 
         override fun onPropertiesChanged(properties: Bundle) {
             super.onPropertiesChanged(properties)
-            mLowBitAmbient = properties.getBoolean(WatchFaceService.PROPERTY_LOW_BIT_AMBIENT, false)
-            mBurnInProtection = properties.getBoolean(WatchFaceService.PROPERTY_BURN_IN_PROTECTION, false)
+            lowBitAmbient = properties.getBoolean(WatchFaceService.PROPERTY_LOW_BIT_AMBIENT, false)
+            burnInProtection = properties.getBoolean(WatchFaceService.PROPERTY_BURN_IN_PROTECTION, false)
         }
 
         override fun onTimeTick() {
@@ -170,7 +170,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         override fun onAmbientModeChanged(inAmbientMode: Boolean) {
             super.onAmbientModeChanged(inAmbientMode)
-            mAmbient = inAmbientMode
+            ambient = inAmbientMode
 
             updateWatchHandStyle()
 
@@ -178,51 +178,51 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         }
 
         private fun updateWatchHandStyle() {
-            if (mAmbient) {
-                mPaintHour.color = Color.WHITE
-                mPaintMinute.color = Color.WHITE
-                mPaintSecond.color = Color.WHITE
-                mPaintTick.color = Color.WHITE
+            if (ambient) {
+                paintHour.color = Color.WHITE
+                paintMinute.color = Color.WHITE
+                paintSecond.color = Color.WHITE
+                paintTick.color = Color.WHITE
 
-                mPaintHour.isAntiAlias = false
-                mPaintMinute.isAntiAlias = false
-                mPaintSecond.isAntiAlias = false
-                mPaintTick.isAntiAlias = false
+                paintHour.isAntiAlias = false
+                paintMinute.isAntiAlias = false
+                paintSecond.isAntiAlias = false
+                paintTick.isAntiAlias = false
 
-                mPaintHour.clearShadowLayer()
-                mPaintMinute.clearShadowLayer()
-                mPaintSecond.clearShadowLayer()
-                mPaintTick.clearShadowLayer()
+                paintHour.clearShadowLayer()
+                paintMinute.clearShadowLayer()
+                paintSecond.clearShadowLayer()
+                paintTick.clearShadowLayer()
             } else {
-                mPaintHour.color = mColorHandHour
-                mPaintMinute.color = mColorHandMinute
-                mPaintSecond.color = mColorHandSecond
-                mPaintTick.color = mColorTick
+                paintHour.color = colorHandHour
+                paintMinute.color = colorHandMinute
+                paintSecond.color = colorHandSecond
+                paintTick.color = colorTick
 
-                mPaintHour.isAntiAlias = true
-                mPaintMinute.isAntiAlias = true
-                mPaintSecond.isAntiAlias = true
-                mPaintTick.isAntiAlias = true
+                paintHour.isAntiAlias = true
+                paintMinute.isAntiAlias = true
+                paintSecond.isAntiAlias = true
+                paintTick.isAntiAlias = true
 
-                mPaintHour.setShadowLayer(mShadowRadius, 0f, 0f, mColorShadow)
-                mPaintMinute.setShadowLayer(mShadowRadius, 0f, 0f, mColorShadow)
-                mPaintSecond.setShadowLayer(mShadowRadius, 0f, 0f, mColorShadow)
-                mPaintTick.setShadowLayer(mShadowRadius, 0f, 0f, mColorShadow)
+                paintHour.setShadowLayer(shadowRadius, 0f, 0f, colorShadow)
+                paintMinute.setShadowLayer(shadowRadius, 0f, 0f, colorShadow)
+                paintSecond.setShadowLayer(shadowRadius, 0f, 0f, colorShadow)
+                paintTick.setShadowLayer(shadowRadius, 0f, 0f, colorShadow)
             }
         }
 
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
             super.onSurfaceChanged(holder, format, width, height)
 
-            mCenterX = width / 2f
-            mCenterY = height / 2f
+            centerX = width / 2f
+            centerY = height / 2f
 
-            mHandLengthHour = mCenterX * HAND_LENGTH_RATIO_HOUR
-            mHandLengthMinute = mCenterX * HAND_LENGTH_RATIO_MINUTE
-            mHandLengthSecond = mCenterX * HAND_LENGTH_RATIO_SECOND
-            mMinorTickLength = mCenterX * MINOR_TICK_LENGTH_RATIO
-            mMajorTickLength = mCenterX * MAJOR_TICK_LENGTH_RATIO
-            mCenterGapLength = mCenterX * CENTER_GAP_LENGTH_RATIO
+            handLengthHour = centerX * HAND_LENGTH_RATIO_HOUR
+            handLengthMinute = centerX * HAND_LENGTH_RATIO_MINUTE
+            handLengthSecond = centerX * HAND_LENGTH_RATIO_SECOND
+            minorTickLength = centerX * MINOR_TICK_LENGTH_RATIO
+            majorTickLength = centerX * MAJOR_TICK_LENGTH_RATIO
+            centerGapLength = centerX * CENTER_GAP_LENGTH_RATIO
 
 //            /* Scale loaded background image (more efficient) if surface dimensions change. */
 //            val scale = width / mBackgroundBitmap.width.toFloat()
@@ -243,19 +243,19 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         override fun onDraw(canvas: Canvas, bounds: Rect) {
             val now = System.currentTimeMillis()
-            mCalendar.timeInMillis = now - now % 1000
+            calendar.timeInMillis = now - now % 1000
 
-            if (mAmbient) {
+            if (ambient) {
                 canvas.drawColor(Color.BLACK)
             } else {
 //                canvas.drawBitmap(mBackgroundBitmap, 0f, 0f, mPaintBackground)
-                canvas.drawColor(mColorBackground)
+                canvas.drawColor(colorBackground)
             }
 
             // Ticks
-            val innerMinorTickRadius = mCenterX - mMinorTickLength
-            val innerMajorTickRadius = mCenterX - mMajorTickLength
-            val outerTickRadius = mCenterX
+            val innerMinorTickRadius = centerX - minorTickLength
+            val innerMajorTickRadius = centerX - majorTickLength
+            val outerTickRadius = centerX
             for (tickIndex in 0..11) {
                 val innerTickRadius = if (tickIndex % 3 == 0) innerMajorTickRadius else innerMinorTickRadius
                 val tickRot = (tickIndex.toDouble() * Math.PI * 2.0 / 12).toFloat()
@@ -263,57 +263,62 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 val innerY = (-Math.cos(tickRot.toDouble())).toFloat() * innerTickRadius
                 val outerX = Math.sin(tickRot.toDouble()).toFloat() * outerTickRadius
                 val outerY = (-Math.cos(tickRot.toDouble())).toFloat() * outerTickRadius
-                canvas.drawLine(mCenterX + innerX,
-                        mCenterY + innerY,
-                        mCenterX + outerX,
-                        mCenterY + outerY,
-                        mPaintTick)
+                canvas.drawLine(
+                    centerX + innerX,
+                    centerY + innerY,
+                    centerX + outerX,
+                    centerY + outerY,
+                    paintTick
+                )
             }
 
-            val seconds = mCalendar[Calendar.SECOND]
+            val seconds = calendar[Calendar.SECOND]
             val secondsRotation = seconds * 6f
 
-            val minutes = mCalendar[Calendar.MINUTE]
+            val minutes = calendar[Calendar.MINUTE]
             val minutesRotation = minutes * 6f + (seconds / 60f) * 6f
 
-            val hoursRotation = mCalendar[Calendar.HOUR] * 30f + (minutes / 60f) * 30f
+            val hoursRotation = calendar[Calendar.HOUR] * 30f + (minutes / 60f) * 30f
 
             canvas.save()
 
             // Hour
-            canvas.rotate(hoursRotation, mCenterX, mCenterY)
+            canvas.rotate(hoursRotation, centerX, centerY)
             canvas.drawLine(
-                    mCenterX,
-                    mCenterY - mCenterGapLength - mHandWidthHour / 2f,
-                    mCenterX,
-                    mCenterY - mHandLengthHour,
-                    mPaintHour)
+                centerX,
+                centerY - centerGapLength - handWidthHour / 2f,
+                centerX,
+                centerY - handLengthHour,
+                paintHour
+            )
 
             // Minute
-            canvas.rotate(minutesRotation - hoursRotation, mCenterX, mCenterY)
+            canvas.rotate(minutesRotation - hoursRotation, centerX, centerY)
             canvas.drawLine(
-                    mCenterX,
-                    mCenterY - mCenterGapLength - mHandWidthMinute / 2f,
-                    mCenterX,
-                    mCenterY - mHandLengthMinute,
-                    mPaintMinute)
+                centerX,
+                centerY - centerGapLength - handWidthMinute / 2f,
+                centerX,
+                centerY - handLengthMinute,
+                paintMinute
+            )
 
             // Second
-            if (!mAmbient) {
-                canvas.rotate(secondsRotation - minutesRotation, mCenterX, mCenterY)
+            if (!ambient) {
+                canvas.rotate(secondsRotation - minutesRotation, centerX, centerY)
                 canvas.drawLine(
-                        mCenterX,
-                        mCenterY - mCenterGapLength - mHandWidthMinute / 2f,
-                        mCenterX,
-                        mCenterY - mHandLengthSecond + mHandWidthSecond / 2f,
-                        mPaintSecond)
+                    centerX,
+                    centerY - centerGapLength - handWidthMinute / 2f,
+                    centerX,
+                    centerY - handLengthSecond + handWidthSecond / 2f,
+                    paintSecond
+                )
             }
 
 //            canvas.drawCircle(
-//                    mCenterX,
-//                    mCenterY,
-//                    mMinorTickLength,
-//                    mPaintTick)
+//                    centerX,
+//                    centerY,
+//                    minorTickLength,
+//                    paintTick)
 
             canvas.restore()
         }
@@ -323,7 +328,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
             if (visible) {
                 registerReceiver()
-                mCalendar.timeZone = TimeZone.getDefault()
+                calendar.timeZone = TimeZone.getDefault()
                 invalidate()
             } else {
                 unregisterReceiver()
@@ -333,27 +338,27 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         }
 
         private fun registerReceiver() {
-            if (mTimeZoneReceiverRegistered) return
-            mTimeZoneReceiverRegistered = true
+            if (timeZoneReceiverRegistered) return
+            timeZoneReceiverRegistered = true
             val filter = IntentFilter(Intent.ACTION_TIMEZONE_CHANGED)
-            registerReceiver(mTimeZoneReceiver, filter)
+            registerReceiver(timeZoneReceiver, filter)
         }
 
         private fun unregisterReceiver() {
-            if (!mTimeZoneReceiverRegistered) return
-            mTimeZoneReceiverRegistered = false
-            unregisterReceiver(mTimeZoneReceiver)
+            if (!timeZoneReceiverRegistered) return
+            timeZoneReceiverRegistered = false
+            unregisterReceiver(timeZoneReceiver)
         }
 
         private fun updateTimer() {
-            mUpdateTimeHandler.removeCallbacksAndMessages(null)
+            updateTimeHandler.removeCallbacksAndMessages(null)
             if (shouldTimerBeRunning()) {
-                mUpdateTimeHandler.sendEmptyMessage(0)
+                updateTimeHandler.sendEmptyMessage(0)
             }
         }
 
         private fun shouldTimerBeRunning(): Boolean {
-            return isVisible && !mAmbient
+            return isVisible && !ambient
         }
 
         /**
@@ -364,7 +369,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             if (shouldTimerBeRunning()) {
                 val now = System.currentTimeMillis()
                 val delay = 1000 - now % 1000
-                mUpdateTimeHandler.sendEmptyMessageDelayed(0, delay)
+                updateTimeHandler.sendEmptyMessageDelayed(0, delay)
             }
         }
 
