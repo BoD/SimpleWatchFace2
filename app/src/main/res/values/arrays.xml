@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="configuration_main_tickStyle_texts">
+        <item>@string/configuration_main_tickStyle_texts_nothing</item>
+        <item>@string/configuration_main_tickStyle_texts_dots4</item>
+        <item>@string/configuration_main_tickStyle_texts_dots12</item>
+        <item>@string/configuration_main_tickStyle_texts_ticks4</item>
+        <item>@string/configuration_main_tickStyle_texts_ticks12</item>
+        <item>@string/configuration_main_tickStyle_texts_numbers4</item>
+        <item>@string/configuration_main_tickStyle_texts_numbers12</item>
+    </string-array>
+
+    <string-array name="configuration_main_tickStyle_values">
+        <item>NOTHING</item>
+        <item>DOTS_4</item>
+        <item>DOTS_12</item>
+        <item>TICKS_4</item>
+        <item>TICKS_12</item>
+        <item>NUMBERS_4</item>
+        <item>NUMBERS_12</item>
+    </string-array>
+
+</resources>

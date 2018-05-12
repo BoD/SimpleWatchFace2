@@ -39,7 +39,10 @@ import android.support.wearable.watchface.WatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
 import android.view.SurfaceHolder
 import org.jraf.android.simplewatchface2.R
+import org.jraf.android.simplewatchface2.prefs.Configuration
+import org.jraf.android.simplewatchface2.prefs.ConfigurationConstants
 import org.jraf.android.simplewatchface2.prefs.ConfigurationPrefs
+import org.jraf.android.simplewatchface2.util.grayScale
 import java.util.Calendar
 import java.util.TimeZone
 
@@ -49,8 +52,10 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private const val HAND_LENGTH_RATIO_HOUR = 1f / 2f + 1f / 8f
         private const val HAND_LENGTH_RATIO_MINUTE = 1f / 2f + 1f / 4f + 1f / 8f
         private const val HAND_LENGTH_RATIO_SECOND = 1f
-        private const val MAJOR_TICK_LENGTH_RATIO = 1f / 7f
-        private const val MINOR_TICK_LENGTH_RATIO = 1f / 16f
+        private const val TICK_MAJOR_LENGTH_RATIO = 1f / 7f
+        private const val TICK_MINOR_LENGTH_RATIO = 1f / 16f
+        private const val DOT_MAJOR_RADIUS_RATIO = 1f / 18f
+        private const val DOT_MINOR_RADIUS_RATIO = 1f / 24f
         private const val CENTER_GAP_LENGTH_RATIO = 1f / 32f
     }
 
@@ -80,8 +85,10 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private var handLengthHour = 0f
         private var handLengthSecond = 0f
         private var handLengthMinute = 0f
-        private var minorTickLength = 0f
-        private var majorTickLength = 0f
+        private var tickMinorLength = 0f
+        private var tickMajorLength = 0f
+        private var dotMinorRadius = 0f
+        private var dotMajorRadius = 0f
         private var centerGapLength = 0f
 
         private var colorBackground: Int = 0
@@ -90,6 +97,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private var colorHandSecond: Int = 0
         private var colorTick: Int = 0
         private var colorShadow: Int = 0
+
+        private var tickStyle: Configuration.TickStyle = Configuration.TickStyle.valueOf(ConfigurationConstants.DEFAULT_TICK_STYLE)
 
         private val paintHour = Paint()
         private val paintMinute = Paint()
@@ -103,15 +112,17 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         override fun onCreate(holder: SurfaceHolder?) {
             super.onCreate(holder)
 
-            setWatchFaceStyle(WatchFaceStyle.Builder(this@SimpleWatchFaceService)
+            setWatchFaceStyle(
+                WatchFaceStyle.Builder(this@SimpleWatchFaceService)
                     .setAcceptsTapEvents(true)
-                    .build())
+                    .build()
+            )
 
 //            mPaintBackground.color = Color.BLACK
 //            mBackgroundBitmap = BitmapFactory.decodeResource(resources, R.drawable.bg)
 
             colorShadow = 0x80000000.toInt()
-            loadColorsFromPrefs()
+            loadPrefs()
 
             handWidthHour = resources.getDimensionPixelSize(R.dimen.hand_width_hour).toFloat()
             handWidthMinute = resources.getDimensionPixelSize(R.dimen.hand_width_minute).toFloat()
@@ -143,12 +154,13 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             prefs.registerOnSharedPreferenceChangeListener(mOnPrefsChanged)
         }
 
-        private fun loadColorsFromPrefs() {
+        private fun loadPrefs() {
             colorBackground = prefs.colorBackground
             colorHandHour = prefs.colorHandHour
             colorHandMinute = prefs.colorHandMinute
             colorHandSecond = prefs.colorHandSecond
             colorTick = prefs.colorTicks
+            tickStyle = Configuration.TickStyle.valueOf(prefs.tickStyle)
         }
 
         override fun onDestroy() {
@@ -181,13 +193,14 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             if (ambient) {
                 paintHour.color = Color.WHITE
                 paintMinute.color = Color.WHITE
-                paintSecond.color = Color.WHITE
-                paintTick.color = Color.WHITE
+                paintTick.color = colorTick.grayScale()
 
-                paintHour.isAntiAlias = false
-                paintMinute.isAntiAlias = false
-                paintSecond.isAntiAlias = false
-                paintTick.isAntiAlias = false
+//                paintHour.isAntiAlias = false
+//                paintMinute.isAntiAlias = false
+//                paintTick.isAntiAlias = false
+                paintHour.isAntiAlias = true
+                paintMinute.isAntiAlias = true
+                paintTick.isAntiAlias = true
 
                 paintHour.clearShadowLayer()
                 paintMinute.clearShadowLayer()
@@ -220,8 +233,10 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             handLengthHour = centerX * HAND_LENGTH_RATIO_HOUR
             handLengthMinute = centerX * HAND_LENGTH_RATIO_MINUTE
             handLengthSecond = centerX * HAND_LENGTH_RATIO_SECOND
-            minorTickLength = centerX * MINOR_TICK_LENGTH_RATIO
-            majorTickLength = centerX * MAJOR_TICK_LENGTH_RATIO
+            tickMinorLength = centerX * TICK_MINOR_LENGTH_RATIO
+            tickMajorLength = centerX * TICK_MAJOR_LENGTH_RATIO
+            dotMinorRadius = centerX * DOT_MINOR_RADIUS_RATIO
+            dotMajorRadius = centerX * DOT_MAJOR_RADIUS_RATIO
             centerGapLength = centerX * CENTER_GAP_LENGTH_RATIO
 
 //            /* Scale loaded background image (more efficient) if surface dimensions change. */
@@ -253,23 +268,17 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             }
 
             // Ticks
-            val innerMinorTickRadius = centerX - minorTickLength
-            val innerMajorTickRadius = centerX - majorTickLength
-            val outerTickRadius = centerX
-            for (tickIndex in 0..11) {
-                val innerTickRadius = if (tickIndex % 3 == 0) innerMajorTickRadius else innerMinorTickRadius
-                val tickRot = (tickIndex.toDouble() * Math.PI * 2.0 / 12).toFloat()
-                val innerX = Math.sin(tickRot.toDouble()).toFloat() * innerTickRadius
-                val innerY = (-Math.cos(tickRot.toDouble())).toFloat() * innerTickRadius
-                val outerX = Math.sin(tickRot.toDouble()).toFloat() * outerTickRadius
-                val outerY = (-Math.cos(tickRot.toDouble())).toFloat() * outerTickRadius
-                canvas.drawLine(
-                    centerX + innerX,
-                    centerY + innerY,
-                    centerX + outerX,
-                    centerY + outerY,
-                    paintTick
-                )
+            when (tickStyle) {
+                Configuration.TickStyle.DOTS_4 -> drawDots(canvas, 4)
+                Configuration.TickStyle.DOTS_12 -> drawDots(canvas, 12)
+                Configuration.TickStyle.TICKS_4 -> drawTicks(canvas, 4)
+                Configuration.TickStyle.TICKS_12 -> drawTicks(canvas, 12)
+                Configuration.TickStyle.NUMBERS_4 -> drawNumbers(canvas, 4)
+                Configuration.TickStyle.NUMBERS_12 -> drawNumbers(canvas, 12)
+
+                Configuration.TickStyle.NOTHING -> {
+                    // Do nothing
+                }
             }
 
             val seconds = calendar[Calendar.SECOND]
@@ -317,10 +326,49 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 //            canvas.drawCircle(
 //                    centerX,
 //                    centerY,
-//                    minorTickLength,
+//                    tickMinorLength,
 //                    paintTick)
 
             canvas.restore()
+        }
+
+        private fun drawDots(canvas: Canvas, num: Int) {
+            for (dotIndex in 0 until num) {
+                val tickRot = (dotIndex.toDouble() * Math.PI * 2.0 / num).toFloat()
+                val dotRadius = if (num > 4 && dotIndex % 3 == 0) dotMajorRadius else dotMinorRadius
+                val cx = Math.sin(tickRot.toDouble()).toFloat() * (centerX - dotRadius) + centerX
+                val cy = (-Math.cos(tickRot.toDouble())).toFloat() * (centerX - dotRadius) + centerY
+                canvas.drawCircle(
+                    cx,
+                    cy,
+                    dotRadius,
+                    paintTick
+                )
+            }
+        }
+
+        private fun drawTicks(canvas: Canvas, num: Int) {
+            val innerMinorTickRadius = centerX - tickMinorLength
+            val innerMajorTickRadius = centerX - tickMajorLength
+            val outerTickRadius = centerX
+            for (tickIndex in 0 until num) {
+                val tickRot = (tickIndex.toDouble() * Math.PI * 2.0 / num).toFloat()
+                val innerTickRadius = if (num > 4 && tickIndex % 3 == 0) innerMajorTickRadius else innerMinorTickRadius
+                val innerX = Math.sin(tickRot.toDouble()).toFloat() * innerTickRadius
+                val innerY = (-Math.cos(tickRot.toDouble())).toFloat() * innerTickRadius
+                val outerX = Math.sin(tickRot.toDouble()).toFloat() * outerTickRadius
+                val outerY = (-Math.cos(tickRot.toDouble())).toFloat() * outerTickRadius
+                canvas.drawLine(
+                    centerX + innerX,
+                    centerY + innerY,
+                    centerX + outerX,
+                    centerY + outerY,
+                    paintTick
+                )
+            }
+        }
+
+        private fun drawNumbers(canvas: Canvas, num: Int) {
         }
 
         override fun onVisibilityChanged(visible: Boolean) {
@@ -374,8 +422,9 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         }
 
         private val mOnPrefsChanged: SharedPreferences.OnSharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
-            loadColorsFromPrefs()
+            loadPrefs()
             updateWatchHandStyle()
+            updateTimer()
         }
     }
 

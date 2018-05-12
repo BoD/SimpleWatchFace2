@@ -7,7 +7,7 @@
  *                              /___/
  * repository.
  *
- * Copyright (C) 2017 Benoit 'BoD' Lubek (BoD@JRAF.org)
+ * Copyright (C) 2018 Benoit 'BoD' Lubek (BoD@JRAF.org)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,40 +22,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jraf.android.simplewatchface2.prefs
+@file:Suppress("NOTHING_TO_INLINE")
+
+package org.jraf.android.simplewatchface2.util
 
 import android.graphics.Color
-import org.jraf.android.prefs.DefaultInt
-import org.jraf.android.prefs.DefaultString
-import org.jraf.android.prefs.Prefs
+import android.support.annotation.ColorInt
+import androidx.core.graphics.luminance
 
-@Prefs
-class Configuration {
-    enum class TickStyle {
-        NOTHING,
-        DOTS_4,
-        DOTS_12,
-        TICKS_4,
-        TICKS_12,
-        NUMBERS_4,
-        NUMBERS_12,
-    }
-
-    @DefaultInt(0xFF220000.toInt())
-    var colorBackground: Int? = null
-
-    @DefaultInt(Color.WHITE)
-    var colorHandHour: Int? = null
-
-    @DefaultInt(Color.WHITE)
-    var colorHandMinute: Int? = null
-
-    @DefaultInt(Color.RED)
-    var colorHandSecond: Int? = null
-
-    @DefaultInt(Color.RED)
-    var colorTicks: Int? = null
-
-    @DefaultString("TICKS_12")
-    var tickStyle: String? = null
+@ColorInt
+inline fun @receiver:ColorInt Int.grayScale(): Int {
+    val luminance = (luminance * 255).toInt()
+    return Color.rgb(luminance, luminance, luminance)
 }

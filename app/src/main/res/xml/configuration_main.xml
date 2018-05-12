@@ -28,6 +28,14 @@
 
     </PreferenceScreen>
 
+    <ListPreference
+        android:defaultValue="TICKS_12"
+        android:entries="@array/configuration_main_tickStyle_texts"
+        android:entryValues="@array/configuration_main_tickStyle_values"
+        android:icon="@drawable/ic_ticks_white_24dp"
+        android:key="tickStyle"
+        android:title="@string/configuration_main_tickStyle" />
+
     <Preference
         android:icon="@drawable/ic_info_white_24dp"
         android:key="about"

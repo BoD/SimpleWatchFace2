@@ -29,9 +29,9 @@ import android.content.Intent
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.preference.PreferenceFragment
+import org.jraf.android.androidwearcolorpicker.app.ColorPickActivity
 import org.jraf.android.simplewatchface2.BuildConfig
 import org.jraf.android.simplewatchface2.R
-import org.jraf.android.simplewatchface2.configuration.main.colorpick.ColorPickActivity
 import org.jraf.android.simplewatchface2.prefs.ConfigurationConstants
 import org.jraf.android.simplewatchface2.prefs.ConfigurationPrefs
 import org.jraf.android.util.about.AboutActivityIntentBuilder
@@ -72,11 +72,7 @@ class MainConfigurationFragment : PreferenceFragment() {
 
     private fun setColorPrefClickListener(prefKey: String, color: Int) {
         findPreference(prefKey).setOnPreferenceClickListener { _ ->
-            //            val intent = ColorPickActivity.IntentBuilder().oldColor(color).build(context)
-            val intent = Intent(
-                context,
-                org.jraf.android.simplewatchface2.configuration.main.colorpick.ColorPickActivity::class.java
-            )
+            val intent = ColorPickActivity.IntentBuilder().oldColor(color).build(context)
             startActivityForResult(intent, prefKey.asRequestCode())
             true
         }
