@@ -33,16 +33,17 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.graphics.Typeface
 import android.os.Bundle
 import android.support.wearable.watchface.CanvasWatchFaceService
 import android.support.wearable.watchface.WatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
 import android.view.SurfaceHolder
+import android.view.WindowInsets
 import org.jraf.android.simplewatchface2.R
 import org.jraf.android.simplewatchface2.prefs.Configuration
 import org.jraf.android.simplewatchface2.prefs.ConfigurationConstants
 import org.jraf.android.simplewatchface2.prefs.ConfigurationPrefs
-import org.jraf.android.simplewatchface2.util.grayScale
 import java.util.Calendar
 import java.util.TimeZone
 
@@ -56,6 +57,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private const val TICK_MINOR_LENGTH_RATIO = 1f / 16f
         private const val DOT_MAJOR_RADIUS_RATIO = 1f / 18f
         private const val DOT_MINOR_RADIUS_RATIO = 1f / 24f
+        private const val NUMBER_MAJOR_SIZE_RATIO = 1f / 3f
+        private const val NUMBER_MINOR_SIZE_RATIO = 1f / 5f
         private const val CENTER_GAP_LENGTH_RATIO = 1f / 32f
     }
 
@@ -89,7 +92,11 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private var tickMajorLength = 0f
         private var dotMinorRadius = 0f
         private var dotMajorRadius = 0f
+        private var numberMinorSize = 0f
+        private var numberMajorSize = 0f
         private var centerGapLength = 0f
+
+        private var dialRadius = 0F
 
         private var colorBackground: Int = 0
         private var colorHandHour: Int = 0
@@ -108,6 +115,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private var ambient = false
         private var lowBitAmbient = false
         private var burnInProtection = false
+        private var chinHeight: Int = 0
 
         override fun onCreate(holder: SurfaceHolder?) {
             super.onCreate(holder)
@@ -139,6 +147,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             paintSecond.strokeCap = Paint.Cap.ROUND
 
             paintTick.strokeWidth = resources.getDimensionPixelSize(R.dimen.tick_width).toFloat()
+            paintTick.textAlign = Paint.Align.CENTER
+            paintTick.typeface = Typeface.createFromAsset(assets, "fonts/Oswald-Medium.ttf")
 
 //            /* Extract colors from background image to improve watchface style. */
 //            Palette.from(mBackgroundBitmap).generate { palette ->
@@ -180,6 +190,11 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             invalidate()
         }
 
+        override fun onApplyWindowInsets(insets: WindowInsets) {
+            super.onApplyWindowInsets(insets)
+            chinHeight = insets.systemWindowInsetBottom
+        }
+
         override fun onAmbientModeChanged(inAmbientMode: Boolean) {
             super.onAmbientModeChanged(inAmbientMode)
             ambient = inAmbientMode
@@ -193,7 +208,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             if (ambient) {
                 paintHour.color = Color.WHITE
                 paintMinute.color = Color.WHITE
-                paintTick.color = colorTick.grayScale()
+//                paintTick.color = colorTick.grayScale()
 
 //                paintHour.isAntiAlias = false
 //                paintMinute.isAntiAlias = false
@@ -237,6 +252,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             tickMajorLength = centerX * TICK_MAJOR_LENGTH_RATIO
             dotMinorRadius = centerX * DOT_MINOR_RADIUS_RATIO
             dotMajorRadius = centerX * DOT_MAJOR_RADIUS_RATIO
+            numberMinorSize = centerX * NUMBER_MINOR_SIZE_RATIO
+            numberMajorSize = centerX * NUMBER_MAJOR_SIZE_RATIO
             centerGapLength = centerX * CENTER_GAP_LENGTH_RATIO
 
 //            /* Scale loaded background image (more efficient) if surface dimensions change. */
@@ -334,10 +351,10 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         private fun drawDots(canvas: Canvas, num: Int) {
             for (dotIndex in 0 until num) {
-                val tickRot = (dotIndex.toDouble() * Math.PI * 2.0 / num).toFloat()
+                val rotation = (dotIndex.toDouble() * Math.PI * 2.0 / num).toFloat()
                 val dotRadius = if (num > 4 && dotIndex % 3 == 0) dotMajorRadius else dotMinorRadius
-                val cx = Math.sin(tickRot.toDouble()).toFloat() * (centerX - dotRadius) + centerX
-                val cy = (-Math.cos(tickRot.toDouble())).toFloat() * (centerX - dotRadius) + centerY
+                val cx = Math.sin(rotation.toDouble()).toFloat() * (centerX - dotRadius) + centerX
+                val cy = (-Math.cos(rotation.toDouble())).toFloat() * (centerX - dotRadius) + centerY
                 canvas.drawCircle(
                     cx,
                     cy,
@@ -352,12 +369,12 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             val innerMajorTickRadius = centerX - tickMajorLength
             val outerTickRadius = centerX
             for (tickIndex in 0 until num) {
-                val tickRot = (tickIndex.toDouble() * Math.PI * 2.0 / num).toFloat()
+                val rotation = (tickIndex.toDouble() * Math.PI * 2.0 / num).toFloat()
                 val innerTickRadius = if (num > 4 && tickIndex % 3 == 0) innerMajorTickRadius else innerMinorTickRadius
-                val innerX = Math.sin(tickRot.toDouble()).toFloat() * innerTickRadius
-                val innerY = (-Math.cos(tickRot.toDouble())).toFloat() * innerTickRadius
-                val outerX = Math.sin(tickRot.toDouble()).toFloat() * outerTickRadius
-                val outerY = (-Math.cos(tickRot.toDouble())).toFloat() * outerTickRadius
+                val innerX = Math.sin(rotation.toDouble()).toFloat() * innerTickRadius
+                val innerY = (-Math.cos(rotation.toDouble())).toFloat() * innerTickRadius
+                val outerX = Math.sin(rotation.toDouble()).toFloat() * outerTickRadius
+                val outerY = (-Math.cos(rotation.toDouble())).toFloat() * outerTickRadius
                 canvas.drawLine(
                     centerX + innerX,
                     centerY + innerY,
@@ -369,6 +386,52 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         }
 
         private fun drawNumbers(canvas: Canvas, num: Int) {
+            val textBounds = Rect()
+            for (numberIndex in 0..11) {
+                // Don't draw minor numbers if we only want major ones
+                if (num == 4 && numberIndex % 3 != 0) continue
+
+                val text = if (numberIndex == 0) "12" else numberIndex.toString()
+                val rotation = (numberIndex.toDouble() * Math.PI * 2.0 / num).toFloat()
+                val textSize = if (numberIndex % 3 == 0) numberMajorSize else numberMinorSize
+                paintTick.textSize = textSize
+                paintTick.getTextBounds(text, 0, text.length, textBounds)
+                val textHeight = textBounds.height()
+                val textWidth = textBounds.width()
+
+                // Initialize the radius the first time
+                // TODO: Reset this if the font changes
+                if (dialRadius == 0F) {
+                    // Calculate the radius so it
+                    val textHalfWidth = textWidth / 2
+                    dialRadius = centerX - textHeight / 2 - (centerX - Math.sqrt((centerX * centerX - textHalfWidth * textHalfWidth).toDouble())).toFloat()
+                }
+
+                val cx = Math.sin(rotation.toDouble()).toFloat() * dialRadius + centerX
+                var cy = (-Math.cos(rotation.toDouble())).toFloat() * dialRadius + centerY
+
+                val diff = (centerY * 2 - chinHeight) - (cy + textHeight / 2)
+                if (diff < 0) {
+                    cy += diff
+                }
+
+//                paintTick.color = Color.rgb(0, 0xFF, 0)
+//                canvas.drawCenteredRect(
+//                    cx,
+//                    cy,
+//                    textWidth,
+//                    textHeight,
+//                    paintTick
+//                )
+//
+//                paintTick.color = Color.rgb(0xFF, 0xFF, 0xFF)
+                canvas.drawText(
+                    text,
+                    cx,
+                    cy + textHeight / 2,
+                    paintTick
+                )
+            }
         }
 
         override fun onVisibilityChanged(visible: Boolean) {
@@ -430,3 +493,4 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
     override fun onCreateEngine() = SimpleWatchFaceEngine()
 }
+
