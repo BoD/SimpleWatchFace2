@@ -25,19 +25,41 @@
 package org.jraf.android.simplewatchface2.configuration.main
 
 import android.app.Activity
+import android.content.ComponentName
 import android.content.Intent
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.preference.PreferenceFragment
+import android.support.wearable.complications.ComplicationData
+import android.support.wearable.complications.ComplicationHelperActivity
 import org.jraf.android.androidwearcolorpicker.app.ColorPickActivity
 import org.jraf.android.simplewatchface2.BuildConfig
 import org.jraf.android.simplewatchface2.R
 import org.jraf.android.simplewatchface2.prefs.ConfigurationConstants
 import org.jraf.android.simplewatchface2.prefs.ConfigurationPrefs
+import org.jraf.android.simplewatchface2.watchface.SimpleWatchFaceService
 import org.jraf.android.util.about.AboutActivityIntentBuilder
 
+
 class MainConfigurationFragment : PreferenceFragment() {
-    private val mPrefs by lazy { ConfigurationPrefs.get(context) }
+    companion object {
+        private val COMPLICATION_TYPES_SMALL = intArrayOf(
+            ComplicationData.TYPE_ICON,
+            ComplicationData.TYPE_RANGED_VALUE,
+            ComplicationData.TYPE_SHORT_TEXT,
+            ComplicationData.TYPE_SMALL_IMAGE
+        )
+
+        private val COMPLICATION_TYPES_BIG = intArrayOf(
+            ComplicationData.TYPE_ICON,
+            ComplicationData.TYPE_RANGED_VALUE,
+            ComplicationData.TYPE_SHORT_TEXT,
+            ComplicationData.TYPE_SMALL_IMAGE,
+            ComplicationData.TYPE_LONG_TEXT
+        )
+    }
+
+    private val prefs by lazy { ConfigurationPrefs.get(context) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,11 +68,17 @@ class MainConfigurationFragment : PreferenceFragment() {
         updateColorPreferences()
 
         // Colors
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_BACKGROUND, mPrefs.colorBackground)
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_HOUR, mPrefs.colorHandHour)
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_MINUTE, mPrefs.colorHandMinute)
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_SECOND, mPrefs.colorHandSecond)
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_TICKS, mPrefs.colorTicks)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_BACKGROUND, prefs.colorBackground)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_HOUR, prefs.colorHandHour)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_MINUTE, prefs.colorHandMinute)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_SECOND, prefs.colorHandSecond)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_TICKS, prefs.colorTicks)
+
+        // Complications
+        setComplicationPrefClickListener("complicationLeft", SimpleWatchFaceService.COMPLICATION_ID_LEFT, COMPLICATION_TYPES_SMALL)
+        setComplicationPrefClickListener("complicationTop", SimpleWatchFaceService.COMPLICATION_ID_TOP, COMPLICATION_TYPES_BIG)
+        setComplicationPrefClickListener("complicationRight", SimpleWatchFaceService.COMPLICATION_ID_RIGHT, COMPLICATION_TYPES_SMALL)
+        setComplicationPrefClickListener("complicationBottom", SimpleWatchFaceService.COMPLICATION_ID_BOTTOM, COMPLICATION_TYPES_BIG)
 
         // About
         findPreference("about").setOnPreferenceClickListener { _ ->
@@ -70,6 +98,23 @@ class MainConfigurationFragment : PreferenceFragment() {
         }
     }
 
+    private fun setComplicationPrefClickListener(prefKey: String, complicationId: Int, supportedTypes: IntArray) {
+        findPreference(prefKey).setOnPreferenceClickListener { _ ->
+            startActivity(
+                ComplicationHelperActivity.createProviderChooserHelperIntent(
+                    activity,
+                    ComponentName(
+                        activity,
+                        SimpleWatchFaceService::class.java
+                    ),
+                    complicationId,
+                    *supportedTypes
+                )
+            )
+            true
+        }
+    }
+
     private fun setColorPrefClickListener(prefKey: String, color: Int) {
         findPreference(prefKey).setOnPreferenceClickListener { _ ->
             val intent = ColorPickActivity.IntentBuilder().oldColor(color).build(context)
@@ -79,11 +124,11 @@ class MainConfigurationFragment : PreferenceFragment() {
     }
 
     private fun updateColorPreferences() {
-        updatePrefColor(ConfigurationConstants.KEY_COLOR_BACKGROUND, mPrefs.colorBackground)
-        updatePrefColor(ConfigurationConstants.KEY_COLOR_HAND_HOUR, mPrefs.colorHandHour)
-        updatePrefColor(ConfigurationConstants.KEY_COLOR_HAND_MINUTE, mPrefs.colorHandMinute)
-        updatePrefColor(ConfigurationConstants.KEY_COLOR_HAND_SECOND, mPrefs.colorHandSecond)
-        updatePrefColor(ConfigurationConstants.KEY_COLOR_TICKS, mPrefs.colorTicks)
+        updatePrefColor(ConfigurationConstants.KEY_COLOR_BACKGROUND, prefs.colorBackground)
+        updatePrefColor(ConfigurationConstants.KEY_COLOR_HAND_HOUR, prefs.colorHandHour)
+        updatePrefColor(ConfigurationConstants.KEY_COLOR_HAND_MINUTE, prefs.colorHandMinute)
+        updatePrefColor(ConfigurationConstants.KEY_COLOR_HAND_SECOND, prefs.colorHandSecond)
+        updatePrefColor(ConfigurationConstants.KEY_COLOR_TICKS, prefs.colorTicks)
     }
 
     private fun updatePrefColor(prefKey: String, color: Int) {
@@ -98,11 +143,11 @@ class MainConfigurationFragment : PreferenceFragment() {
 
         val pickedColor = data?.getIntExtra(ColorPickActivity.EXTRA_RESULT, 0)
         when (requestCode) {
-            ConfigurationConstants.KEY_COLOR_BACKGROUND.asRequestCode() -> mPrefs.colorBackground = pickedColor
-            ConfigurationConstants.KEY_COLOR_HAND_HOUR.asRequestCode() -> mPrefs.colorHandHour = pickedColor
-            ConfigurationConstants.KEY_COLOR_HAND_MINUTE.asRequestCode() -> mPrefs.colorHandMinute = pickedColor
-            ConfigurationConstants.KEY_COLOR_HAND_SECOND.asRequestCode() -> mPrefs.colorHandSecond = pickedColor
-            ConfigurationConstants.KEY_COLOR_TICKS.asRequestCode() -> mPrefs.colorTicks = pickedColor
+            ConfigurationConstants.KEY_COLOR_BACKGROUND.asRequestCode() -> prefs.colorBackground = pickedColor
+            ConfigurationConstants.KEY_COLOR_HAND_HOUR.asRequestCode() -> prefs.colorHandHour = pickedColor
+            ConfigurationConstants.KEY_COLOR_HAND_MINUTE.asRequestCode() -> prefs.colorHandMinute = pickedColor
+            ConfigurationConstants.KEY_COLOR_HAND_SECOND.asRequestCode() -> prefs.colorHandSecond = pickedColor
+            ConfigurationConstants.KEY_COLOR_TICKS.asRequestCode() -> prefs.colorTicks = pickedColor
         }
         updateColorPreferences()
     }

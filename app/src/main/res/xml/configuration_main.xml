@@ -28,6 +28,28 @@
 
     </PreferenceScreen>
 
+    <PreferenceScreen
+        android:icon="@drawable/ic_widgets_white_24dp"
+        android:title="@string/configuration_complications_title">
+
+        <Preference
+            android:key="complicationTop"
+            android:title="@string/configuration_complications_top" />
+
+        <Preference
+            android:key="complicationLeft"
+            android:title="@string/configuration_complications_left" />
+
+        <Preference
+            android:key="complicationRight"
+            android:title="@string/configuration_complications_right" />
+
+        <Preference
+            android:key="complicationBottom"
+            android:title="@string/configuration_complications_bottom" />
+
+    </PreferenceScreen>
+
     <ListPreference
         android:defaultValue="TICKS_12"
         android:entries="@array/configuration_main_tickStyle_texts"

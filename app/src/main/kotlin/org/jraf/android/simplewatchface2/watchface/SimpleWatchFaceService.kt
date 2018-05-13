@@ -35,11 +35,18 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.os.Bundle
+import android.support.wearable.complications.ComplicationData
+import android.support.wearable.complications.SystemProviders
+import android.support.wearable.complications.rendering.ComplicationDrawable
 import android.support.wearable.watchface.CanvasWatchFaceService
 import android.support.wearable.watchface.WatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
+import android.util.SparseArray
 import android.view.SurfaceHolder
 import android.view.WindowInsets
+import androidx.core.util.keyIterator
+import androidx.core.util.set
+import androidx.core.util.valueIterator
 import org.jraf.android.simplewatchface2.R
 import org.jraf.android.simplewatchface2.prefs.Configuration
 import org.jraf.android.simplewatchface2.prefs.ConfigurationConstants
@@ -47,9 +54,15 @@ import org.jraf.android.simplewatchface2.prefs.ConfigurationPrefs
 import java.util.Calendar
 import java.util.TimeZone
 
+
 class SimpleWatchFaceService : CanvasWatchFaceService() {
 
     companion object {
+        const val COMPLICATION_ID_LEFT = 1
+        const val COMPLICATION_ID_TOP = 2
+        const val COMPLICATION_ID_RIGHT = 3
+        const val COMPLICATION_ID_BOTTOM = 4
+
         private const val HAND_LENGTH_RATIO_HOUR = 1f / 2f + 1f / 8f
         private const val HAND_LENGTH_RATIO_MINUTE = 1f / 2f + 1f / 4f + 1f / 8f
         private const val HAND_LENGTH_RATIO_SECOND = 1f
@@ -60,6 +73,28 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private const val NUMBER_MAJOR_SIZE_RATIO = 1f / 3f
         private const val NUMBER_MINOR_SIZE_RATIO = 1f / 5f
         private const val CENTER_GAP_LENGTH_RATIO = 1f / 32f
+        private const val COMPLICATION_SMALL_WIDTH_RATIO = 1f / 2f
+        private const val COMPLICATION_BIG_WIDTH_RATIO = 1.3f
+        private const val COMPLICATION_BIG_HEIGHT_RATIO = 1f / 2.25f
+
+        private val COMPLICATION_IDS = intArrayOf(
+            COMPLICATION_ID_LEFT,
+            COMPLICATION_ID_TOP,
+            COMPLICATION_ID_RIGHT,
+            COMPLICATION_ID_BOTTOM
+        )
+    }
+
+    private enum class ComplicationSize {
+        SMALL,
+        BIG;
+
+        companion object {
+            fun fromComplicationType(complicationType: Int) = when (complicationType) {
+                ComplicationData.TYPE_LARGE_IMAGE, ComplicationData.TYPE_LONG_TEXT -> BIG
+                else -> SMALL
+            }
+        }
     }
 
     inner class SimpleWatchFaceEngine : CanvasWatchFaceService.Engine() {
@@ -95,15 +130,18 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private var numberMinorSize = 0f
         private var numberMajorSize = 0f
         private var centerGapLength = 0f
+        private var complicationSmallWidth = 0f
+        private var complicationBigWidth = 0f
+        private var complicationBigHeight = 0f
 
         private var dialRadius = 0F
 
-        private var colorBackground: Int = 0
-        private var colorHandHour: Int = 0
-        private var colorHandMinute: Int = 0
-        private var colorHandSecond: Int = 0
-        private var colorTick: Int = 0
-        private var colorShadow: Int = 0
+        private var colorBackground = 0
+        private var colorHandHour = 0
+        private var colorHandMinute = 0
+        private var colorHandSecond = 0
+        private var colorTick = 0
+        private var colorShadow = 0
 
         private var tickStyle: Configuration.TickStyle = Configuration.TickStyle.valueOf(ConfigurationConstants.DEFAULT_TICK_STYLE)
 
@@ -115,7 +153,23 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private var ambient = false
         private var lowBitAmbient = false
         private var burnInProtection = false
-        private var chinHeight: Int = 0
+        private var chinHeight = 0
+
+        private val complicationDrawableById = SparseArray<ComplicationDrawable>(COMPLICATION_IDS.size)
+        private val complicationSizeById = SparseArray<ComplicationSize>(COMPLICATION_IDS.size)
+
+        private val numberTextBounds: Array<Rect> by lazy {
+            val res = arrayListOf<Rect>()
+            for (numberIndex in 0..11) {
+                val text = if (numberIndex == 0) "12" else numberIndex.toString()
+                val textSize = if (numberIndex % 3 == 0) numberMajorSize else numberMinorSize
+                paintTick.textSize = textSize
+                val textBounds = Rect()
+                paintTick.getTextBounds(text, 0, text.length, textBounds)
+                res += textBounds
+            }
+            res.toTypedArray()
+        }
 
         override fun onCreate(holder: SurfaceHolder?) {
             super.onCreate(holder)
@@ -156,12 +210,40 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 //                    mColorHandHighlight = palette.getVibrantColor(Color.RED)
 //                    mColorHand = palette.getLightVibrantColor(Color.WHITE)
 //                    colorShadow = palette.getDarkMutedColor(Color.BLACK)
-//                    updateWatchHandStyle()
+//                    updatePaints()
 //                }
 //            }
 
-            updateWatchHandStyle()
+            initComplications()
+
+            updatePaints()
+            updateComplicationDrawableColors()
             prefs.registerOnSharedPreferenceChangeListener(mOnPrefsChanged)
+        }
+
+        private fun updateComplicationDrawableColors() {
+            for (complicationId in complicationDrawableById.keyIterator()) {
+                val complicationDrawable = complicationDrawableById[complicationId]
+                val complicationSize = complicationSizeById[complicationId]
+
+                // Active mode colors
+                complicationDrawable.setBorderColorActive(if (complicationSize == ComplicationSize.SMALL) colorHandSecond else Color.TRANSPARENT)
+                complicationDrawable.setRangedValuePrimaryColorActive(colorHandSecond)
+                complicationDrawable.setTextColorActive(colorTick)
+                complicationDrawable.setTitleColorActive(colorHandSecond)
+                complicationDrawable.setIconColorActive(colorTick)
+                complicationDrawable.setTextSizeActive(resources.getDimensionPixelSize(R.dimen.complication_textSize))
+                complicationDrawable.setTitleSizeActive(resources.getDimensionPixelSize(R.dimen.complication_titleSize))
+
+                // Ambient mode colors
+                complicationDrawable.setBorderColorAmbient(Color.TRANSPARENT)
+                complicationDrawable.setRangedValuePrimaryColorAmbient(colorHandSecond)
+                complicationDrawable.setTextColorAmbient(colorTick)
+                complicationDrawable.setTitleColorAmbient(colorHandSecond)
+                complicationDrawable.setIconColorAmbient(colorTick)
+                complicationDrawable.setTextSizeAmbient(resources.getDimensionPixelSize(R.dimen.complication_textSize))
+                complicationDrawable.setTitleSizeAmbient(resources.getDimensionPixelSize(R.dimen.complication_titleSize))
+            }
         }
 
         private fun loadPrefs() {
@@ -183,6 +265,12 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             super.onPropertiesChanged(properties)
             lowBitAmbient = properties.getBoolean(WatchFaceService.PROPERTY_LOW_BIT_AMBIENT, false)
             burnInProtection = properties.getBoolean(WatchFaceService.PROPERTY_BURN_IN_PROTECTION, false)
+
+            // Complications
+            for (complicationDrawable in complicationDrawableById.valueIterator()) {
+                complicationDrawable.setLowBitAmbient(lowBitAmbient)
+                complicationDrawable.setBurnInProtection(burnInProtection)
+            }
         }
 
         override fun onTimeTick() {
@@ -199,12 +287,16 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             super.onAmbientModeChanged(inAmbientMode)
             ambient = inAmbientMode
 
-            updateWatchHandStyle()
+            updatePaints()
 
+            // Complications
+            for (complicationDrawable in complicationDrawableById.valueIterator()) {
+                complicationDrawable.setInAmbientMode(inAmbientMode)
+            }
             updateTimer()
         }
 
-        private fun updateWatchHandStyle() {
+        private fun updatePaints() {
             if (ambient) {
                 paintHour.color = Color.WHITE
                 paintMinute.color = Color.WHITE
@@ -239,6 +331,30 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             }
         }
 
+        private fun initComplications() {
+            val topComplicationDrawable = ComplicationDrawable(this@SimpleWatchFaceService)
+            complicationDrawableById[COMPLICATION_ID_TOP] = topComplicationDrawable
+            complicationSizeById[COMPLICATION_ID_TOP] = ComplicationSize.SMALL
+            setDefaultSystemComplicationProvider(COMPLICATION_ID_TOP, SystemProviders.NEXT_EVENT, ComplicationData.TYPE_LONG_TEXT)
+
+            val rightComplicationDrawable = ComplicationDrawable(this@SimpleWatchFaceService)
+            complicationDrawableById[COMPLICATION_ID_RIGHT] = rightComplicationDrawable
+            complicationSizeById[COMPLICATION_ID_RIGHT] = ComplicationSize.SMALL
+            setDefaultSystemComplicationProvider(COMPLICATION_ID_RIGHT, SystemProviders.STEP_COUNT, ComplicationData.TYPE_SHORT_TEXT)
+
+            val bottomComplicationDrawable = ComplicationDrawable(this@SimpleWatchFaceService)
+            complicationDrawableById[COMPLICATION_ID_BOTTOM] = bottomComplicationDrawable
+            complicationSizeById[COMPLICATION_ID_BOTTOM] = ComplicationSize.SMALL
+            setDefaultSystemComplicationProvider(COMPLICATION_ID_BOTTOM, SystemProviders.DATE, ComplicationData.TYPE_LONG_TEXT)
+
+            val leftComplicationDrawable = ComplicationDrawable(this@SimpleWatchFaceService)
+            complicationDrawableById[COMPLICATION_ID_LEFT] = leftComplicationDrawable
+            complicationSizeById[COMPLICATION_ID_LEFT] = ComplicationSize.SMALL
+            setDefaultSystemComplicationProvider(COMPLICATION_ID_LEFT, SystemProviders.DAY_OF_WEEK, ComplicationData.TYPE_SHORT_TEXT)
+
+            setActiveComplications(*COMPLICATION_IDS)
+        }
+
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
             super.onSurfaceChanged(holder, format, width, height)
 
@@ -255,6 +371,10 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             numberMinorSize = centerX * NUMBER_MINOR_SIZE_RATIO
             numberMajorSize = centerX * NUMBER_MAJOR_SIZE_RATIO
             centerGapLength = centerX * CENTER_GAP_LENGTH_RATIO
+            complicationSmallWidth = centerX * COMPLICATION_SMALL_WIDTH_RATIO
+            complicationBigWidth = centerX * COMPLICATION_BIG_WIDTH_RATIO
+            complicationBigHeight = centerY * COMPLICATION_BIG_HEIGHT_RATIO
+
 
 //            /* Scale loaded background image (more efficient) if surface dimensions change. */
 //            val scale = width / mBackgroundBitmap.width.toFloat()
@@ -263,11 +383,86 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 //                    (mBackgroundBitmap.width * scale).toInt(),
 //                    (mBackgroundBitmap.height * scale).toInt(), true)
 
+
+            // Complications
+            updateComplicationDrawableBounds()
+        }
+
+        private fun updateComplicationDrawableBounds() {
+            val horizMargin = Math.max(numberTextBounds[3].width(), numberTextBounds[9].width())
+            val vertMargin = Math.max(numberTextBounds[0].height(), numberTextBounds[6].height())
+
+            // Left
+//            val leftCmplWidth = if (complicationSizeById[COMPLICATION_ID_LEFT] == ComplicationSize.SMALL) complicationSmallWidth else complicationBigWidth
+            val leftCmplWidth = complicationSmallWidth
+            val leftCmplLeft = horizMargin / 2 + centerX / 2 - leftCmplWidth / 2
+            val leftCmplTop = centerY - leftCmplWidth / 2
+            val leftCmplBounds = Rect(
+                leftCmplLeft.toInt(),
+                leftCmplTop.toInt(),
+                (leftCmplLeft + leftCmplWidth).toInt(),
+                (leftCmplTop + leftCmplWidth).toInt()
+            )
+            complicationDrawableById[COMPLICATION_ID_LEFT].bounds = leftCmplBounds
+
+            // Right
+            val rightCmplWidth = complicationSmallWidth
+            val rightCmplLeft = centerX * 2 - rightCmplWidth - leftCmplLeft
+            val rightCmplTop = centerY - rightCmplWidth / 2
+            val rightCmplBounds = Rect(
+                rightCmplLeft.toInt(),
+                rightCmplTop.toInt(),
+                (rightCmplLeft + rightCmplWidth).toInt(),
+                (rightCmplTop + rightCmplWidth).toInt()
+            )
+            complicationDrawableById[COMPLICATION_ID_RIGHT].bounds = rightCmplBounds
+
+            // Top
+            val topCmplIsSmall = complicationSizeById[COMPLICATION_ID_TOP] == ComplicationSize.SMALL
+            val topCmplWidth = if (topCmplIsSmall) complicationSmallWidth else complicationBigWidth
+            val topCmplHeight = if (topCmplIsSmall) complicationSmallWidth else complicationBigHeight
+            val topCmplLeft = centerX - topCmplWidth / 2
+            val topCmplTop = if (topCmplIsSmall) vertMargin / 2 + centerY / 2 - topCmplHeight / 2 else vertMargin / 2 + rightCmplTop / 2 - topCmplHeight / 2
+            val topCmplBounds = Rect(
+                topCmplLeft.toInt(),
+                topCmplTop.toInt(),
+                (topCmplLeft + topCmplWidth).toInt(),
+                (topCmplTop + topCmplHeight).toInt()
+            )
+            complicationDrawableById[COMPLICATION_ID_TOP].bounds = topCmplBounds
+
+            // Bottom
+            val bottomCmplIsSmall = complicationSizeById[COMPLICATION_ID_BOTTOM] == ComplicationSize.SMALL
+            val bottomCmplWidth = if (bottomCmplIsSmall) complicationSmallWidth else complicationBigWidth
+            val bottomCmplHeight = if (bottomCmplIsSmall) complicationSmallWidth else complicationBigHeight
+            val bottomCmplLeft = centerX - bottomCmplWidth / 2
+            val bottomCmplTop =
+                centerY * 2 - (if (bottomCmplIsSmall) vertMargin / 2 + centerY / 2 - bottomCmplHeight / 2 else vertMargin / 2 + rightCmplTop / 2 - bottomCmplHeight / 2) - bottomCmplHeight
+            val bottomCmplBounds = Rect(
+                bottomCmplLeft.toInt(),
+                bottomCmplTop.toInt(),
+                (bottomCmplLeft + bottomCmplWidth).toInt(),
+                (bottomCmplTop + bottomCmplHeight).toInt()
+            )
+            complicationDrawableById[COMPLICATION_ID_BOTTOM].bounds = bottomCmplBounds
+        }
+
+        override fun onComplicationDataUpdate(complicationId: Int, complicationData: ComplicationData) {
+            complicationDrawableById[complicationId].setComplicationData(complicationData)
+            complicationSizeById[complicationId] = ComplicationSize.fromComplicationType(complicationData.type)
+            updateComplicationDrawableBounds()
+            updateComplicationDrawableColors()
+            invalidate()
         }
 
         override fun onTapCommand(tapType: Int, x: Int, y: Int, eventTime: Long) {
             when (tapType) {
                 WatchFaceService.TAP_TYPE_TAP -> {
+                    for (complicationId in COMPLICATION_IDS) {
+                        val complicationDrawable = complicationDrawableById.get(complicationId)
+                        val successfulTap = complicationDrawable.onTap(x, y)
+                        if (successfulTap) return
+                    }
                 }
             }
             invalidate()
@@ -297,6 +492,9 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                     // Do nothing
                 }
             }
+
+            // Complications
+            drawComplications(canvas, now)
 
             val seconds = calendar[Calendar.SECOND]
             val secondsRotation = seconds * 6f
@@ -349,12 +547,13 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             canvas.restore()
         }
 
-        private fun drawDots(canvas: Canvas, num: Int) {
+        @Suppress("NOTHING_TO_INLINE")
+        private inline fun drawDots(canvas: Canvas, num: Int) {
             for (dotIndex in 0 until num) {
                 val rotation = (dotIndex.toDouble() * Math.PI * 2.0 / num).toFloat()
                 val dotRadius = if (num > 4 && dotIndex % 3 == 0) dotMajorRadius else dotMinorRadius
-                val cx = Math.sin(rotation.toDouble()).toFloat() * (centerX - dotRadius) + centerX
-                val cy = (-Math.cos(rotation.toDouble())).toFloat() * (centerX - dotRadius) + centerY
+                val cx = Math.sin(rotation.toDouble()).toFloat() * (centerX - dotMajorRadius) + centerX
+                val cy = (-Math.cos(rotation.toDouble())).toFloat() * (centerX - dotMajorRadius) + centerY
                 canvas.drawCircle(
                     cx,
                     cy,
@@ -364,7 +563,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             }
         }
 
-        private fun drawTicks(canvas: Canvas, num: Int) {
+        @Suppress("NOTHING_TO_INLINE")
+        private inline fun drawTicks(canvas: Canvas, num: Int) {
             val innerMinorTickRadius = centerX - tickMinorLength
             val innerMajorTickRadius = centerX - tickMajorLength
             val outerTickRadius = centerX
@@ -385,8 +585,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             }
         }
 
-        private fun drawNumbers(canvas: Canvas, num: Int) {
-            val textBounds = Rect()
+        @Suppress("NOTHING_TO_INLINE")
+        private inline fun drawNumbers(canvas: Canvas, num: Int) {
             for (numberIndex in 0..11) {
                 // Don't draw minor numbers if we only want major ones
                 if (num == 4 && numberIndex % 3 != 0) continue
@@ -395,14 +595,13 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 val rotation = (numberIndex.toDouble() * Math.PI * 2.0 / num).toFloat()
                 val textSize = if (numberIndex % 3 == 0) numberMajorSize else numberMinorSize
                 paintTick.textSize = textSize
-                paintTick.getTextBounds(text, 0, text.length, textBounds)
-                val textHeight = textBounds.height()
-                val textWidth = textBounds.width()
+                val textHeight = numberTextBounds[numberIndex].height()
+                val textWidth = numberTextBounds[numberIndex].width()
 
                 // Initialize the radius the first time
                 // TODO: Reset this if the font changes
                 if (dialRadius == 0F) {
-                    // Calculate the radius so it
+                    // Calculate the radius so the "12" number fits at the highest value in the circle
                     val textHalfWidth = textWidth / 2
                     dialRadius = centerX - textHeight / 2 - (centerX - Math.sqrt((centerX * centerX - textHalfWidth * textHalfWidth).toDouble())).toFloat()
                 }
@@ -431,6 +630,13 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                     cy + textHeight / 2,
                     paintTick
                 )
+            }
+        }
+
+        @Suppress("NOTHING_TO_INLINE")
+        private inline fun drawComplications(canvas: Canvas, currentTimeMillis: Long) {
+            for (complicationDrawable in complicationDrawableById.valueIterator()) {
+                complicationDrawable.draw(canvas, currentTimeMillis)
             }
         }
 
@@ -486,7 +692,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         private val mOnPrefsChanged: SharedPreferences.OnSharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
             loadPrefs()
-            updateWatchHandStyle()
+            updatePaints()
+            updateComplicationDrawableColors()
             updateTimer()
         }
     }

@@ -2,9 +2,6 @@
     <string name="app_name">SimpleWatchFace2</string>
     <string name="message">Watch face tapped</string>
     <string name="my_analog_name">My Analog</string>
-    <string name="configuration_main_title">Configuration</string>
-    <string name="configuration_colors_background">Background</string>
-    <string name="configuration_colors_title">Colors</string>
 
     <!-- About -->
     <string name="about_authorCopyright" translatable="false">Copyright (C) 2017 Benoit \'BoD\' Lubek.</string>
@@ -19,6 +16,9 @@
     <string name="about_shareText_body">This app lists movies showing at your favorite theater, on your watch.\nCheck it out here:\nhttp://play.google.com/store/apps/details?id=%s</string>
 
     <!-- Configuration -->
+    <string name="configuration_main_title">Configuration</string>
+    <string name="configuration_colors_background">Background</string>
+    <string name="configuration_colors_title">Colors</string>
     <string name="configuration_main_about">About</string>
     <string name="configuration_colors_handHour">Hour hand</string>
     <string name="configuration_colors_handMinute">Minute hand</string>
@@ -32,5 +32,13 @@
     <string name="configuration_main_tickStyle_texts_ticks12">12 ticks</string>
     <string name="configuration_main_tickStyle_texts_numbers4">4 numbers</string>
     <string name="configuration_main_tickStyle_texts_numbers12">12 numbers</string>
+
+    <!-- Complications -->
+    <string name="configuration_complications_title">Complications</string>
+    <string name="configuration_complications_top">Top</string>
+    <string name="configuration_complications_left">Left</string>
+    <string name="configuration_complications_right">Right</string>
+    <string name="configuration_complications_bottom">Bottom</string>
+
 
 </resources>
