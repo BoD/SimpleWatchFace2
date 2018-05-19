@@ -4,7 +4,7 @@
     <string name="my_analog_name">My Analog</string>
 
     <!-- About -->
-    <string name="about_authorCopyright" translatable="false">Copyright (C) 2017 Benoit \'BoD\' Lubek.</string>
+    <string name="about_authorCopyright" translatable="false">Copyright (C) 2017-2018 Benoit \'BoD\' Lubek.\nAdditional code/math/ideas/❤️ by Carmen Alvarez</string>
     <string name="about_License" translatable="false">Licensed under the terms of the GNU General Public License.</string>
     <string name="about_email_uri" translatable="false">mailto:BoD@JRAF.org</string>
     <string name="about_email_text">Contact the author</string>
@@ -23,15 +23,17 @@
     <string name="configuration_colors_handHour">Hour hand</string>
     <string name="configuration_colors_handMinute">Minute hand</string>
     <string name="configuration_colors_handSecond">Second hand</string>
-    <string name="configuration_colors_ticks">Ticks</string>
-    <string name="configuration_main_tickStyle">Ticks</string>
-    <string name="configuration_main_tickStyle_texts_nothing">Nothing</string>
-    <string name="configuration_main_tickStyle_texts_dots4">4 dots</string>
-    <string name="configuration_main_tickStyle_texts_dots12">12 dots</string>
-    <string name="configuration_main_tickStyle_texts_ticks4">4 ticks</string>
-    <string name="configuration_main_tickStyle_texts_ticks12">12 ticks</string>
-    <string name="configuration_main_tickStyle_texts_numbers4">4 numbers</string>
-    <string name="configuration_main_tickStyle_texts_numbers12">12 numbers</string>
+    <string name="configuration_colors_dial">Dial</string>
+    <string name="configuration_main_dialStyle">Dial</string>
+    <string name="configuration_colors_complications_base">Complications base</string>
+    <string name="configuration_colors_complications_highlight">Complications highlight</string>
+    <string name="configuration_main_dialStyle_texts_nothing">Nothing</string>
+    <string name="configuration_main_dialStyle_texts_dots4">4 dots</string>
+    <string name="configuration_main_dialStyle_texts_dots12">12 dots</string>
+    <string name="configuration_main_dialStyle_texts_ticks4">4 ticks</string>
+    <string name="configuration_main_dialStyle_texts_ticks12">12 ticks</string>
+    <string name="configuration_main_dialStyle_texts_numbers4">4 numbers</string>
+    <string name="configuration_main_dialStyle_texts_numbers12">12 numbers</string>
 
     <!-- Complications -->
     <string name="configuration_complications_title">Complications</string>

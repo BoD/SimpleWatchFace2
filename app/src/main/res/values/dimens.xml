@@ -5,5 +5,6 @@
     <dimen name="tick_width">4dp</dimen>
     <dimen name="shadow_radius">2dp</dimen>
     <dimen name="complication_textSize">18dp</dimen>
-    <dimen name="complication_titleSize">10dp</dimen>
+    <dimen name="complication_titleSize">18dp</dimen>
+    <dimen name="digits_margin_vertical">2dp</dimen>
 </resources>

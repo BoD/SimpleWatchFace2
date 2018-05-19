@@ -72,7 +72,9 @@ class MainConfigurationFragment : PreferenceFragment() {
         setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_HOUR, prefs.colorHandHour)
         setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_MINUTE, prefs.colorHandMinute)
         setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_SECOND, prefs.colorHandSecond)
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_TICKS, prefs.colorTicks)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_DIAL, prefs.colorDial)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_COMPLICATIONS_BASE, prefs.colorComplicationsBase)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_COMPLICATIONS_HIGHLIGHT, prefs.colorComplicationsHighlight)
 
         // Complications
         setComplicationPrefClickListener("complicationLeft", SimpleWatchFaceService.COMPLICATION_ID_LEFT, COMPLICATION_TYPES_SMALL)
@@ -82,18 +84,20 @@ class MainConfigurationFragment : PreferenceFragment() {
 
         // About
         findPreference("about").setOnPreferenceClickListener { _ ->
-            val builder = AboutActivityIntentBuilder()
-            builder.setAppName(getString(R.string.app_name))
-            builder.setBuildDate(BuildConfig.BUILD_DATE)
-            builder.setGitSha1(BuildConfig.GIT_SHA1)
-            builder.setAuthorCopyright(getString(R.string.about_authorCopyright))
-            builder.setLicense(getString(R.string.about_License))
-            builder.setShareTextSubject(getString(R.string.about_shareText_subject))
-            builder.setShareTextBody(getString(R.string.about_shareText_body))
-            builder.addLink(getString(R.string.about_email_uri), getString(R.string.about_email_text))
-            builder.addLink(getString(R.string.about_web_uri), getString(R.string.about_web_text))
-            builder.addLink(getString(R.string.about_sources_uri), getString(R.string.about_sources_text))
-            startActivity(builder.build(context))
+            startActivity(
+                AboutActivityIntentBuilder()
+                    .setAppName(getString(R.string.app_name))
+                    .setBuildDate(BuildConfig.BUILD_DATE)
+                    .setGitSha1(BuildConfig.GIT_SHA1)
+                    .setAuthorCopyright(getString(R.string.about_authorCopyright))
+                    .setLicense(getString(R.string.about_License))
+                    .setShareTextSubject(getString(R.string.about_shareText_subject))
+                    .setShareTextBody(getString(R.string.about_shareText_body))
+                    .addLink(getString(R.string.about_email_uri), getString(R.string.about_email_text))
+                    .addLink(getString(R.string.about_web_uri), getString(R.string.about_web_text))
+                    .addLink(getString(R.string.about_sources_uri), getString(R.string.about_sources_text))
+                    .build(context)
+            )
             true
         }
     }
@@ -128,7 +132,10 @@ class MainConfigurationFragment : PreferenceFragment() {
         updatePrefColor(ConfigurationConstants.KEY_COLOR_HAND_HOUR, prefs.colorHandHour)
         updatePrefColor(ConfigurationConstants.KEY_COLOR_HAND_MINUTE, prefs.colorHandMinute)
         updatePrefColor(ConfigurationConstants.KEY_COLOR_HAND_SECOND, prefs.colorHandSecond)
-        updatePrefColor(ConfigurationConstants.KEY_COLOR_TICKS, prefs.colorTicks)
+        updatePrefColor(ConfigurationConstants.KEY_COLOR_DIAL, prefs.colorDial)
+        updatePrefColor(ConfigurationConstants.KEY_COLOR_COMPLICATIONS_BASE, prefs.colorComplicationsBase)
+        updatePrefColor(ConfigurationConstants.KEY_COLOR_COMPLICATIONS_HIGHLIGHT, prefs.colorComplicationsHighlight)
+
     }
 
     private fun updatePrefColor(prefKey: String, color: Int) {
@@ -147,7 +154,9 @@ class MainConfigurationFragment : PreferenceFragment() {
             ConfigurationConstants.KEY_COLOR_HAND_HOUR.asRequestCode() -> prefs.colorHandHour = pickedColor
             ConfigurationConstants.KEY_COLOR_HAND_MINUTE.asRequestCode() -> prefs.colorHandMinute = pickedColor
             ConfigurationConstants.KEY_COLOR_HAND_SECOND.asRequestCode() -> prefs.colorHandSecond = pickedColor
-            ConfigurationConstants.KEY_COLOR_TICKS.asRequestCode() -> prefs.colorTicks = pickedColor
+            ConfigurationConstants.KEY_COLOR_DIAL.asRequestCode() -> prefs.colorDial = pickedColor
+            ConfigurationConstants.KEY_COLOR_COMPLICATIONS_BASE.asRequestCode() -> prefs.colorComplicationsBase = pickedColor
+            ConfigurationConstants.KEY_COLOR_COMPLICATIONS_HIGHLIGHT.asRequestCode() -> prefs.colorComplicationsHighlight = pickedColor
         }
         updateColorPreferences()
     }

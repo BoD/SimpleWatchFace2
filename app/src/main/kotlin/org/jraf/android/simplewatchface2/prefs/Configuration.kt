@@ -31,7 +31,7 @@ import org.jraf.android.prefs.Prefs
 
 @Prefs
 class Configuration {
-    enum class TickStyle {
+    enum class DialStyle {
         NOTHING,
         DOTS_4,
         DOTS_12,
@@ -54,8 +54,14 @@ class Configuration {
     var colorHandSecond: Int? = null
 
     @DefaultInt(Color.RED)
-    var colorTicks: Int? = null
+    var colorDial: Int? = null
+
+    @DefaultInt(Color.WHITE)
+    var colorComplicationsBase: Int? = null
+
+    @DefaultInt(Color.RED)
+    var colorComplicationsHighlight: Int? = null
 
     @DefaultString("TICKS_12")
-    var tickStyle: String? = null
+    var dialStyle: String? = null
 }

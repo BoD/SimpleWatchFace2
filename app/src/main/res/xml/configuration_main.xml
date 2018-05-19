@@ -23,13 +23,20 @@
             android:title="@string/configuration_colors_handSecond" />
 
         <Preference
-            android:key="colorTicks"
-            android:title="@string/configuration_colors_ticks" />
+            android:key="colorDial"
+            android:title="@string/configuration_colors_dial" />
 
+        <Preference
+            android:key="colorComplicationsBase"
+            android:title="@string/configuration_colors_complications_base" />
+
+        <Preference
+            android:key="colorComplicationsHighlight"
+            android:title="@string/configuration_colors_complications_highlight" />
     </PreferenceScreen>
 
     <PreferenceScreen
-        android:icon="@drawable/ic_widgets_white_24dp"
+        android:icon="@drawable/ic_complications_white_24dp"
         android:title="@string/configuration_complications_title">
 
         <Preference
@@ -52,11 +59,11 @@
 
     <ListPreference
         android:defaultValue="TICKS_12"
-        android:entries="@array/configuration_main_tickStyle_texts"
-        android:entryValues="@array/configuration_main_tickStyle_values"
-        android:icon="@drawable/ic_ticks_white_24dp"
-        android:key="tickStyle"
-        android:title="@string/configuration_main_tickStyle" />
+        android:entries="@array/configuration_main_dialStyle_texts"
+        android:entryValues="@array/configuration_main_dialStyle_values"
+        android:icon="@drawable/ic_dial_white_24dp"
+        android:key="dialStyle"
+        android:title="@string/configuration_main_dialStyle" />
 
     <Preference
         android:icon="@drawable/ic_info_white_24dp"

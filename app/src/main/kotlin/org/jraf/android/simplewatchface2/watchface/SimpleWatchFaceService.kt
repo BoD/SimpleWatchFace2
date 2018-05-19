@@ -54,7 +54,6 @@ import org.jraf.android.simplewatchface2.prefs.ConfigurationPrefs
 import java.util.Calendar
 import java.util.TimeZone
 
-
 class SimpleWatchFaceService : CanvasWatchFaceService() {
 
     companion object {
@@ -70,8 +69,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private const val TICK_MINOR_LENGTH_RATIO = 1f / 16f
         private const val DOT_MAJOR_RADIUS_RATIO = 1f / 18f
         private const val DOT_MINOR_RADIUS_RATIO = 1f / 24f
-        private const val NUMBER_MAJOR_SIZE_RATIO = 1f / 3f
-        private const val NUMBER_MINOR_SIZE_RATIO = 1f / 5f
+        private const val NUMBER_MAJOR_SIZE_RATIO = 1f / 4f
+        private const val NUMBER_MINOR_SIZE_RATIO = 1f / 6f
         private const val CENTER_GAP_LENGTH_RATIO = 1f / 32f
         private const val COMPLICATION_SMALL_WIDTH_RATIO = 1f / 2f
         private const val COMPLICATION_BIG_WIDTH_RATIO = 1.3f
@@ -120,6 +119,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private var handWidthSecond = 0f
         private var shadowRadius = 0f
 
+        private var digitsMarginVertical = 0f
+
         private var handLengthHour = 0f
         private var handLengthSecond = 0f
         private var handLengthMinute = 0f
@@ -140,10 +141,12 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private var colorHandHour = 0
         private var colorHandMinute = 0
         private var colorHandSecond = 0
-        private var colorTick = 0
+        private var colorDial = 0
         private var colorShadow = 0
+        private var colorComplicationsBase = 0
+        private var colorComplicationsHighlight = 0
 
-        private var tickStyle: Configuration.TickStyle = Configuration.TickStyle.valueOf(ConfigurationConstants.DEFAULT_TICK_STYLE)
+        private var dialStyle: Configuration.DialStyle = Configuration.DialStyle.valueOf(ConfigurationConstants.DEFAULT_DIAL_STYLE)
 
         private val paintHour = Paint()
         private val paintMinute = Paint()
@@ -191,6 +194,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             handWidthSecond = resources.getDimensionPixelSize(R.dimen.hand_width_second).toFloat()
             shadowRadius = resources.getDimensionPixelSize(R.dimen.shadow_radius).toFloat()
 
+            digitsMarginVertical = resources.getDimensionPixelSize(R.dimen.digits_margin_vertical).toFloat()
+
             paintHour.strokeWidth = handWidthHour
             paintHour.strokeCap = Paint.Cap.ROUND
 
@@ -226,21 +231,21 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 val complicationDrawable = complicationDrawableById[complicationId]
                 val complicationSize = complicationSizeById[complicationId]
 
-                // Active mode colors
-                complicationDrawable.setBorderColorActive(if (complicationSize == ComplicationSize.SMALL) colorHandSecond else Color.TRANSPARENT)
-                complicationDrawable.setRangedValuePrimaryColorActive(colorHandSecond)
-                complicationDrawable.setTextColorActive(colorTick)
-                complicationDrawable.setTitleColorActive(colorHandSecond)
-                complicationDrawable.setIconColorActive(colorTick)
+                // Active mode
+                complicationDrawable.setBorderColorActive(if (complicationSize == ComplicationSize.SMALL) colorComplicationsHighlight else Color.TRANSPARENT)
+                complicationDrawable.setRangedValuePrimaryColorActive(colorComplicationsHighlight)
+                complicationDrawable.setTextColorActive(colorComplicationsBase)
+                complicationDrawable.setTitleColorActive(colorComplicationsBase)
+                complicationDrawable.setIconColorActive(colorComplicationsBase)
                 complicationDrawable.setTextSizeActive(resources.getDimensionPixelSize(R.dimen.complication_textSize))
                 complicationDrawable.setTitleSizeActive(resources.getDimensionPixelSize(R.dimen.complication_titleSize))
 
-                // Ambient mode colors
+                // Ambient mode
                 complicationDrawable.setBorderColorAmbient(Color.TRANSPARENT)
-                complicationDrawable.setRangedValuePrimaryColorAmbient(colorHandSecond)
-                complicationDrawable.setTextColorAmbient(colorTick)
-                complicationDrawable.setTitleColorAmbient(colorHandSecond)
-                complicationDrawable.setIconColorAmbient(colorTick)
+                complicationDrawable.setRangedValuePrimaryColorAmbient(colorComplicationsHighlight)
+                complicationDrawable.setTextColorAmbient(colorComplicationsBase)
+                complicationDrawable.setTitleColorAmbient(colorComplicationsBase)
+                complicationDrawable.setIconColorAmbient(colorComplicationsBase)
                 complicationDrawable.setTextSizeAmbient(resources.getDimensionPixelSize(R.dimen.complication_textSize))
                 complicationDrawable.setTitleSizeAmbient(resources.getDimensionPixelSize(R.dimen.complication_titleSize))
             }
@@ -251,8 +256,10 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             colorHandHour = prefs.colorHandHour
             colorHandMinute = prefs.colorHandMinute
             colorHandSecond = prefs.colorHandSecond
-            colorTick = prefs.colorTicks
-            tickStyle = Configuration.TickStyle.valueOf(prefs.tickStyle)
+            colorDial = prefs.colorDial
+            colorComplicationsBase = prefs.colorComplicationsBase
+            colorComplicationsHighlight = prefs.colorComplicationsHighlight
+            dialStyle = Configuration.DialStyle.valueOf(prefs.dialStyle)
         }
 
         override fun onDestroy() {
@@ -300,7 +307,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             if (ambient) {
                 paintHour.color = Color.WHITE
                 paintMinute.color = Color.WHITE
-//                paintTick.color = colorTick.grayScale()
+//                paintTick.color = colorDial.grayScale()
 
 //                paintHour.isAntiAlias = false
 //                paintMinute.isAntiAlias = false
@@ -317,7 +324,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 paintHour.color = colorHandHour
                 paintMinute.color = colorHandMinute
                 paintSecond.color = colorHandSecond
-                paintTick.color = colorTick
+                paintTick.color = colorDial
 
                 paintHour.isAntiAlias = true
                 paintMinute.isAntiAlias = true
@@ -479,16 +486,16 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 canvas.drawColor(colorBackground)
             }
 
-            // Ticks
-            when (tickStyle) {
-                Configuration.TickStyle.DOTS_4 -> drawDots(canvas, 4)
-                Configuration.TickStyle.DOTS_12 -> drawDots(canvas, 12)
-                Configuration.TickStyle.TICKS_4 -> drawTicks(canvas, 4)
-                Configuration.TickStyle.TICKS_12 -> drawTicks(canvas, 12)
-                Configuration.TickStyle.NUMBERS_4 -> drawNumbers(canvas, 4)
-                Configuration.TickStyle.NUMBERS_12 -> drawNumbers(canvas, 12)
+            // Dial
+            when (dialStyle) {
+                Configuration.DialStyle.DOTS_4 -> drawDots(canvas, 4)
+                Configuration.DialStyle.DOTS_12 -> drawDots(canvas, 12)
+                Configuration.DialStyle.TICKS_4 -> drawTicks(canvas, 4)
+                Configuration.DialStyle.TICKS_12 -> drawTicks(canvas, 12)
+                Configuration.DialStyle.NUMBERS_4 -> drawNumbers(canvas, 4)
+                Configuration.DialStyle.NUMBERS_12 -> drawNumbers(canvas, 12)
 
-                Configuration.TickStyle.NOTHING -> {
+                Configuration.DialStyle.NOTHING -> {
                     // Do nothing
                 }
             }
@@ -596,14 +603,17 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 val textSize = if (numberIndex % 3 == 0) numberMajorSize else numberMinorSize
                 paintTick.textSize = textSize
                 val textHeight = numberTextBounds[numberIndex].height()
-                val textWidth = numberTextBounds[numberIndex].width()
+//                val textWidth = numberTextBounds[numberIndex].width()
 
                 // Initialize the radius the first time
                 // TODO: Reset this if the font changes
                 if (dialRadius == 0F) {
-                    // Calculate the radius so the "12" number fits at the highest value in the circle
-                    val textHalfWidth = textWidth / 2
-                    dialRadius = centerX - textHeight / 2 - (centerX - Math.sqrt((centerX * centerX - textHalfWidth * textHalfWidth).toDouble())).toFloat()
+//                    // Calculate the radius so the "12" number fits at the highest value in the circle
+//                    val textHalfWidth = textWidth / 2
+//                    dialRadius = centerX - textHeight / 2 - (centerX - Math.sqrt((centerX * centerX - textHalfWidth * textHalfWidth).toDouble())).toFloat()
+                    // Calculate the radius using a margin
+                    dialRadius = centerX - textHeight / 2 - digitsMarginVertical
+
                 }
 
                 val cx = Math.sin(rotation.toDouble()).toFloat() * dialRadius + centerX
