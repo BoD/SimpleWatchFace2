@@ -1,7 +1,4 @@
 <resources>
-    <dimen name="hand_width_hour">6dp</dimen>
-    <dimen name="hand_width_minute">4dp</dimen>
-    <dimen name="hand_width_second">2dp</dimen>
     <dimen name="tick_width">4dp</dimen>
     <dimen name="shadow_radius">2dp</dimen>
     <dimen name="complication_textSize">18dp</dimen>

@@ -32,7 +32,7 @@ import org.jraf.android.util.log.Log
 
 class SimpleWatchFaceApplication : Application() {
     companion object {
-        private const val TAG = "SimpleWatchFace"
+        private const val TAG = "SimpleWatchFace2"
     }
 
     override fun onCreate() {
