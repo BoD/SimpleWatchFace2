@@ -74,7 +74,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private const val NUMBER_MAJOR_SIZE_RATIO = 1F / 4F
         private const val NUMBER_MINOR_SIZE_RATIO = 1F / 6F
         private const val CENTER_GAP_LENGTH_RATIO = 1F / 32F
-        private const val COMPLICATION_SMALL_WIDTH_RATIO = 1F / 2F
+        private const val COMPLICATION_SMALL_WIDTH_RATIO = 1F / 1.8F
         private const val COMPLICATION_BIG_WIDTH_RATIO = 1.3F
         private const val COMPLICATION_BIG_HEIGHT_RATIO = 1F / 2.25F
 
@@ -159,8 +159,14 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private val complicationDrawableById = SparseArray<ComplicationDrawable>(COMPLICATION_IDS.size)
         private val complicationSizeById = SparseArray<ComplicationSize>(COMPLICATION_IDS.size)
 
-        private lateinit var handHourBitmap: Bitmap
-        private lateinit var handMinuteBitmap: Bitmap
+        private lateinit var handHourAmbientBitmap: Bitmap
+        private lateinit var handHourActiveBitmap: Bitmap
+        private val handHourBitmap inline get() = if (ambient) handHourAmbientBitmap else handHourActiveBitmap
+
+        private lateinit var handMinuteAmbientBitmap: Bitmap
+        private lateinit var handMinuteActiveBitmap: Bitmap
+        private val handMinuteBitmap inline get() = if (ambient) handMinuteAmbientBitmap else handMinuteActiveBitmap
+
         private lateinit var handSecondBitmap: Bitmap
 
         private val shouldTimerBeRunning get() = isVisible && !ambient
@@ -246,9 +252,11 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             updateComplicationDrawableBounds()
 
             updatePaints()
+
+            initAmbientBitmaps()
+
             updateBitmaps()
         }
-
 
         override fun onApplyWindowInsets(insets: WindowInsets) {
             super.onApplyWindowInsets(insets)
@@ -272,9 +280,19 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             updatePaints()
         }
 
-        override fun onTimeTick() {
-            super.onTimeTick()
-            invalidate()
+        override fun onVisibilityChanged(visible: Boolean) {
+            super.onVisibilityChanged(visible)
+            Log.d()
+
+            if (visible) {
+                registerReceiver()
+                calendar.timeZone = TimeZone.getDefault()
+                invalidate()
+            } else {
+                unregisterReceiver()
+            }
+
+            updateTimer()
         }
 
         override fun onAmbientModeChanged(inAmbientMode: Boolean) {
@@ -283,13 +301,18 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             ambient = inAmbientMode
 
             updatePaints()
-            updateBitmaps()
+//            updateBitmaps()
 
             // Complications
             for (complicationDrawable in complicationDrawableById.valueIterator()) {
                 complicationDrawable.setInAmbientMode(inAmbientMode)
             }
             updateTimer()
+        }
+
+        override fun onTimeTick() {
+            super.onTimeTick()
+            invalidate()
         }
 
         override fun onDestroy() {
@@ -313,7 +336,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 complicationDrawable.setTitleSizeActive(resources.getDimensionPixelSize(R.dimen.complication_titleSize))
 
                 // Ambient mode
-                complicationDrawable.setBorderColorAmbient(Color.TRANSPARENT)
+                complicationDrawable.setBorderColorAmbient(if (complicationSize == ComplicationSize.SMALL) colorComplicationsHighlight else Color.TRANSPARENT)
                 complicationDrawable.setRangedValuePrimaryColorAmbient(colorComplicationsHighlight)
                 complicationDrawable.setTextColorAmbient(colorComplicationsBase)
                 complicationDrawable.setTitleColorAmbient(colorComplicationsBase)
@@ -336,7 +359,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         private fun updatePaints() {
             if (!ambient) {
-                // Normal mode
+                // Active mode
                 paintTick.color = colorDial
 
                 paintHour.isAntiAlias = true
@@ -346,7 +369,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
                 paintTick.setShadowLayer(shadowRadius, 0F, 0F, colorShadow)
             } else {
-                // Ambiant mode
+                // Ambient mode
 //                paintTick.color = colorDial.grayScale()
                 paintTick.color = colorDial
 
@@ -358,13 +381,23 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             }
         }
 
-        private fun updateBitmaps() {
-            handHourBitmap = handHourSourceBitmap
-                .tinted(if (ambient) Color.WHITE else colorHandHour)
+        private fun initAmbientBitmaps() {
+            handHourAmbientBitmap = handHourSourceBitmap
+                .tinted(Color.WHITE)
                 .withShadow(shadowRadius, colorShadow)
 
-            handMinuteBitmap = handMinuteSourceBitmap
-                .tinted(if (ambient) Color.WHITE else colorHandMinute)
+            handMinuteAmbientBitmap = handMinuteSourceBitmap
+                .tinted(Color.WHITE)
+                .withShadow(shadowRadius, colorShadow)
+        }
+
+        private fun updateBitmaps() {
+            handHourActiveBitmap = handHourSourceBitmap
+                .tinted(colorHandHour)
+                .withShadow(shadowRadius, colorShadow)
+
+            handMinuteActiveBitmap = handMinuteSourceBitmap
+                .tinted(colorHandMinute)
                 .withShadow(shadowRadius, colorShadow)
 
             handSecondBitmap = handSecondSourceBitmap
@@ -476,6 +509,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         }
 
         override fun onDraw(canvas: Canvas, bounds: Rect) {
+            Log.d()
             val now = System.currentTimeMillis()
             calendar.timeInMillis = now - now % 1000
 
@@ -586,8 +620,10 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         @Suppress("NOTHING_TO_INLINE")
         private inline fun drawComplications(canvas: Canvas, currentTimeMillis: Long) {
-            for (complicationDrawable in complicationDrawableById.valueIterator()) {
-                complicationDrawable.draw(canvas, currentTimeMillis)
+            if (!ambient) {
+                for (complicationDrawable in complicationDrawableById.valueIterator()) {
+                    complicationDrawable.draw(canvas, currentTimeMillis)
+                }
             }
         }
 
@@ -620,20 +656,6 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             canvas.restore()
         }
 
-        override fun onVisibilityChanged(visible: Boolean) {
-            super.onVisibilityChanged(visible)
-
-            if (visible) {
-                registerReceiver()
-                calendar.timeZone = TimeZone.getDefault()
-                invalidate()
-            } else {
-                unregisterReceiver()
-            }
-
-            updateTimer()
-        }
-
         private fun registerReceiver() {
             if (timeZoneReceiverRegistered) return
             timeZoneReceiverRegistered = true
@@ -649,9 +671,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         private fun updateTimer() {
             updateTimeHandler.removeCallbacksAndMessages(null)
-            if (shouldTimerBeRunning) {
-                updateTimeHandler.sendEmptyMessage(0)
-            }
+            updateTimeHandler.sendEmptyMessage(0)
         }
 
         /**
