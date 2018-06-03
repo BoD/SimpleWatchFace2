@@ -4,11 +4,11 @@ def versions = [:]
 // Plugins
 def plugins = [:]
 plugins.with {
-    androidGradle = '3.2.0-alpha15'
+    androidGradle = '3.2.0-alpha16'
     gradleVersions = '0.17.0'
     fabric = '1.25.4'
     dexCount = '0.8.2'
-    gmsStrictVersionMatcher = '1.0.0'
+    gmsStrictVersionMatcher = '1.0.2'
 }
 versions.plugins = plugins
 

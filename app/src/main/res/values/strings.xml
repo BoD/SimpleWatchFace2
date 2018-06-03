@@ -37,6 +37,7 @@
 
     <!-- Complications -->
     <string name="configuration_complications_title">Complications</string>
+    <string name="configuration_complications_background">Background</string>
     <string name="configuration_complications_top">Top</string>
     <string name="configuration_complications_left">Left</string>
     <string name="configuration_complications_right">Right</string>

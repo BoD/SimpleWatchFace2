@@ -43,6 +43,8 @@ import org.jraf.android.util.about.AboutActivityIntentBuilder
 
 class MainConfigurationFragment : PreferenceFragment() {
     companion object {
+        private val COMPLICATION_TYPES_BACKGROUND = intArrayOf(ComplicationData.TYPE_LARGE_IMAGE)
+
         private val COMPLICATION_TYPES_SMALL = intArrayOf(
             ComplicationData.TYPE_ICON,
             ComplicationData.TYPE_RANGED_VALUE,
@@ -77,6 +79,7 @@ class MainConfigurationFragment : PreferenceFragment() {
         setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_COMPLICATIONS_HIGHLIGHT, prefs.colorComplicationsHighlight)
 
         // Complications
+        setComplicationPrefClickListener("complicationBackground", SimpleWatchFaceService.COMPLICATION_ID_BACKGROUND, COMPLICATION_TYPES_BACKGROUND)
         setComplicationPrefClickListener("complicationLeft", SimpleWatchFaceService.COMPLICATION_ID_LEFT, COMPLICATION_TYPES_SMALL)
         setComplicationPrefClickListener("complicationTop", SimpleWatchFaceService.COMPLICATION_ID_TOP, COMPLICATION_TYPES_BIG)
         setComplicationPrefClickListener("complicationRight", SimpleWatchFaceService.COMPLICATION_ID_RIGHT, COMPLICATION_TYPES_SMALL)

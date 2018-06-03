@@ -21,3 +21,4 @@ etc/proguard
 .idea/kotlinc.xml
 .idea/vcs.xml
 .idea/workspace.xml
+.idea/assetWizardSettings.xml

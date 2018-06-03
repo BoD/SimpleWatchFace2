@@ -45,7 +45,6 @@ import android.support.wearable.watchface.WatchFaceStyle
 import android.util.SparseArray
 import android.view.SurfaceHolder
 import android.view.WindowInsets
-import androidx.core.util.keyIterator
 import androidx.core.util.set
 import androidx.core.util.valueIterator
 import org.jraf.android.simplewatchface2.R
@@ -66,6 +65,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         const val COMPLICATION_ID_TOP = 2
         const val COMPLICATION_ID_RIGHT = 3
         const val COMPLICATION_ID_BOTTOM = 4
+        const val COMPLICATION_ID_BACKGROUND = 5
 
         private const val TICK_MAJOR_LENGTH_RATIO = 1F / 7F
         private const val TICK_MINOR_LENGTH_RATIO = 1F / 16F
@@ -82,7 +82,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             COMPLICATION_ID_LEFT,
             COMPLICATION_ID_TOP,
             COMPLICATION_ID_RIGHT,
-            COMPLICATION_ID_BOTTOM
+            COMPLICATION_ID_BOTTOM,
+            COMPLICATION_ID_BACKGROUND
         )
     }
 
@@ -158,6 +159,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         private val complicationDrawableById = SparseArray<ComplicationDrawable>(COMPLICATION_IDS.size)
         private val complicationSizeById = SparseArray<ComplicationSize>(COMPLICATION_IDS.size)
+        private var hasBackgroundComplication = false
 
         private lateinit var handHourAmbientBitmap: Bitmap
         private lateinit var handHourActiveBitmap: Bitmap
@@ -322,7 +324,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         }
 
         private fun updateComplicationDrawableColors() {
-            for (complicationId in complicationDrawableById.keyIterator()) {
+            for (complicationId in COMPLICATION_IDS.filterNot { it == COMPLICATION_ID_BACKGROUND }) {
                 val complicationDrawable = complicationDrawableById[complicationId]
                 val complicationSize = complicationSizeById[complicationId]
 
@@ -426,6 +428,10 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             complicationSizeById[COMPLICATION_ID_LEFT] = ComplicationSize.SMALL
             setDefaultSystemComplicationProvider(COMPLICATION_ID_LEFT, SystemProviders.DAY_OF_WEEK, ComplicationData.TYPE_SHORT_TEXT)
 
+            val backgroundComplicationDrawable = ComplicationDrawable(this@SimpleWatchFaceService)
+            backgroundComplicationDrawable.setBorderColorActive(Color.TRANSPARENT)
+            complicationDrawableById[COMPLICATION_ID_BACKGROUND] = backgroundComplicationDrawable
+
             setActiveComplications(*COMPLICATION_IDS)
         }
 
@@ -485,6 +491,14 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 (bottomCmplTop + bottomCmplHeight).toInt()
             )
             complicationDrawableById[COMPLICATION_ID_BOTTOM].bounds = bottomCmplBounds
+
+            // Background
+            complicationDrawableById[COMPLICATION_ID_BACKGROUND].bounds = Rect(
+                0,
+                0,
+                width,
+                height
+            )
         }
 
         override fun onComplicationDataUpdate(complicationId: Int, complicationData: ComplicationData) {
@@ -492,13 +506,19 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             complicationSizeById[complicationId] = ComplicationSize.fromComplicationType(complicationData.type)
             updateComplicationDrawableBounds()
             updateComplicationDrawableColors()
+
+            if (complicationId == COMPLICATION_ID_BACKGROUND) {
+                hasBackgroundComplication = complicationData.type != ComplicationData.TYPE_EMPTY
+            }
+
             invalidate()
         }
 
         override fun onTapCommand(tapType: Int, x: Int, y: Int, eventTime: Long) {
             when (tapType) {
                 WatchFaceService.TAP_TYPE_TAP -> {
-                    for (complicationId in COMPLICATION_IDS) {
+                    // Exclude the background complication
+                    for (complicationId in COMPLICATION_IDS.filterNot { it == COMPLICATION_ID_BACKGROUND }) {
                         val complicationDrawable = complicationDrawableById.get(complicationId)
                         val successfulTap = complicationDrawable.onTap(x, y)
                         if (successfulTap) return
@@ -513,11 +533,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             val now = System.currentTimeMillis()
             calendar.timeInMillis = now - now % 1000
 
-            if (ambient) {
-                canvas.drawColor(Color.BLACK)
-            } else {
-                canvas.drawColor(colorBackground)
-            }
+            // Background / background complication
+            drawBackground(canvas, now)
 
             // Dial
             when (dialStyle) {
@@ -533,11 +550,29 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 }
             }
 
-            // Complications
-            drawComplications(canvas, now)
+            // Other complications
+            drawOtherComplications(canvas, now)
 
+            // Hands
             drawHands(canvas)
         }
+
+        @Suppress("NOTHING_TO_INLINE")
+        private inline fun drawBackground(canvas: Canvas, currentTimeMillis: Long) {
+            if (!ambient) {
+                if (hasBackgroundComplication) {
+                    // Complication
+                    val complicationDrawable = complicationDrawableById.get(COMPLICATION_ID_BACKGROUND)
+                    complicationDrawable.draw(canvas, currentTimeMillis)
+                } else {
+                    // Color
+                    canvas.drawColor(colorBackground)
+                }
+            } else {
+                canvas.drawColor(Color.BLACK)
+            }
+        }
+
 
         @Suppress("NOTHING_TO_INLINE")
         private inline fun drawDots(canvas: Canvas, num: Int) {
@@ -619,9 +654,11 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         }
 
         @Suppress("NOTHING_TO_INLINE")
-        private inline fun drawComplications(canvas: Canvas, currentTimeMillis: Long) {
+        private inline fun drawOtherComplications(canvas: Canvas, currentTimeMillis: Long) {
             if (!ambient) {
-                for (complicationDrawable in complicationDrawableById.valueIterator()) {
+                // Exclude the background complication
+                for (complicationId in COMPLICATION_IDS.filterNot { it == COMPLICATION_ID_BACKGROUND }) {
+                    val complicationDrawable = complicationDrawableById.get(complicationId)
                     complicationDrawable.draw(canvas, currentTimeMillis)
                 }
             }

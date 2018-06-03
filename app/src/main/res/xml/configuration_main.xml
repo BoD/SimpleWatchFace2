@@ -40,6 +40,10 @@
         android:title="@string/configuration_complications_title">
 
         <Preference
+            android:key="complicationBackground"
+            android:title="@string/configuration_complications_background" />
+
+        <Preference
             android:key="complicationTop"
             android:title="@string/configuration_complications_top" />
 
