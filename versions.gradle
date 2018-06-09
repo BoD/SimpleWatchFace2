@@ -4,7 +4,7 @@ def versions = [:]
 // Plugins
 def plugins = [:]
 plugins.with {
-    androidGradle = '3.2.0-alpha16'
+    androidGradle = '3.2.0-alpha17'
     gradleVersions = '0.17.0'
     fabric = '1.25.4'
     dexCount = '0.8.2'

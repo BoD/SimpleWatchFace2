@@ -336,6 +336,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 complicationDrawable.setIconColorActive(colorComplicationsBase)
                 complicationDrawable.setTextSizeActive(resources.getDimensionPixelSize(R.dimen.complication_textSize))
                 complicationDrawable.setTitleSizeActive(resources.getDimensionPixelSize(R.dimen.complication_titleSize))
+                complicationDrawable.setBackgroundColorActive(resources.getColor(R.color.complication_background, null))
 
                 // Ambient mode
                 complicationDrawable.setBorderColorAmbient(if (complicationSize == ComplicationSize.SMALL) colorComplicationsHighlight else Color.TRANSPARENT)
@@ -345,6 +346,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 complicationDrawable.setIconColorAmbient(colorComplicationsBase)
                 complicationDrawable.setTextSizeAmbient(resources.getDimensionPixelSize(R.dimen.complication_textSize))
                 complicationDrawable.setTitleSizeAmbient(resources.getDimensionPixelSize(R.dimen.complication_titleSize))
+                complicationDrawable.setBackgroundColorAmbient(resources.getColor(R.color.complication_background, null))
             }
         }
 
@@ -429,7 +431,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             setDefaultSystemComplicationProvider(COMPLICATION_ID_LEFT, SystemProviders.DAY_OF_WEEK, ComplicationData.TYPE_SHORT_TEXT)
 
             val backgroundComplicationDrawable = ComplicationDrawable(this@SimpleWatchFaceService)
-            backgroundComplicationDrawable.setBorderColorActive(Color.TRANSPARENT)
+            backgroundComplicationDrawable.setBorderWidthActive(0)
+            backgroundComplicationDrawable.setBorderWidthAmbient(0)
             complicationDrawableById[COMPLICATION_ID_BACKGROUND] = backgroundComplicationDrawable
 
             setActiveComplications(*COMPLICATION_IDS)
@@ -509,6 +512,11 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
             if (complicationId == COMPLICATION_ID_BACKGROUND) {
                 hasBackgroundComplication = complicationData.type != ComplicationData.TYPE_EMPTY
+                if (hasBackgroundComplication) {
+                    val drawable = complicationData.largeImage.loadDrawable(this@SimpleWatchFaceService)
+
+
+                }
             }
 
             invalidate()
