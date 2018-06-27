@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    id="svg2"
+    height="480"
+    width="480"
+    version="1.1"
+    viewBox="0 0 480 480"
+    inkscape:version="0.91 r13725"
+    sodipodi:docname="hands_3.svg">
+    <defs
+        id="defs12" />
+    <sodipodi:namedview
+        pagecolor="#ffffff"
+        bordercolor="#666666"
+        borderopacity="1"
+        objecttolerance="10"
+        gridtolerance="10000"
+        guidetolerance="10"
+        inkscape:pageopacity="0"
+        inkscape:pageshadow="2"
+        inkscape:window-width="1440"
+        inkscape:window-height="856"
+        id="namedview10"
+        showgrid="true"
+        inkscape:zoom="2"
+        inkscape:cx="156.52631"
+        inkscape:cy="271.27192"
+        inkscape:window-x="0"
+        inkscape:window-y="0"
+        inkscape:window-maximized="1"
+        inkscape:current-layer="layer3">
+        <inkscape:grid
+            type="xygrid"
+            id="grid3351"
+            dotted="true" />
+    </sodipodi:namedview>
+    <metadata
+        id="metadata7">
+        <rdf:RDF>
+            <cc:Work
+                rdf:about="">
+                <dc:format>image/svg+xml</dc:format>
+                <dc:type
+                    rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+                <dc:title></dc:title>
+            </cc:Work>
+        </rdf:RDF>
+    </metadata>
+    <g
+        inkscape:groupmode="layer"
+        id="layer1"
+        inkscape:label="hour"
+        style="display:inline">
+        <g
+            id="layer5"
+            transform="matrix(1.0003912,0,0,0.9999706,-0.09192102,0.00726122)"
+            style="fill:#ff0000">
+            <path
+                style="fill:#ff0000"
+                d="m 238.91406,113.99609 0.008,0.004 C 236.75103,114 235,115.74992 235,117.91992 l 0,117.19141 A 7,7 0 0 0 233,240 a 7,7 0 0 0 7,7 7,7 0 0 0 7,-7 7,7 0 0 0 -2,-4.89648 l 0,-117.17774 c 0,-2.18 -1.75103,-3.92969 -3.92188,-3.92969 l -2.16406,0 z M 240,235 a 5,5 0 0 1 5,5 5,5 0 0 1 -5,5 5,5 0 0 1 -5,-5 5,5 0 0 1 5,-5 z"
+                transform="matrix(0.99960895,0,0,1,0.09188507,0)"
+                id="rect3487"
+                inkscape:connector-curvature="0" />
+        </g>
+    </g>
+    <g
+        inkscape:groupmode="layer"
+        id="layer2"
+        inkscape:label="minute"
+        style="display:inline">
+        <g
+            id="layer6"
+            transform="translate(0,6e-4)"
+            style="fill:#00ff00">
+            <path
+                style="fill:#00ff00"
+                d="m 240,46.177734 c -1.939,0 -3.5,1.200007 -3.5,2.691407 l 0,187.562499 A 5,5 0 0 0 235,240 a 5,5 0 0 0 5,5 5,5 0 0 0 5,-5 5,5 0 0 0 -1.5,-3.56445 l 0,-187.566409 c 0,-1.4914 -1.561,-2.691407 -3.5,-2.691407 z M 240,237 a 3,3 0 0 1 3,3 3,3 0 0 1 -3,3 3,3 0 0 1 -3,-3 3,3 0 0 1 3,-3 z"
+                transform="translate(0,-6e-4)"
+                id="rect4299"
+                inkscape:connector-curvature="0" />
+        </g>
+    </g>
+    <g
+        inkscape:groupmode="layer"
+        id="layer3"
+        inkscape:label="second"
+        style="display:inline">
+        <g
+            id="layer7"
+            style="fill:#0000ff">
+            <path
+                style="fill:#0000ff"
+                d="M 240 43.5 C 239.82346 43.5 239.64693 43.538538 239.5 43.617188 C 239.39518 43.673296 239.30273 43.914073 239.30273 43.914062 L 238.75195 118.91992 L 237.87305 237.88672 A 3 3 0 0 0 237 240 A 3 3 0 0 0 237.8418 242.08398 L 237.5 288.50195 L 238.75 290.00195 L 240 291.50195 L 241.25 290.00195 L 242.5 288.50195 L 242.1582 242.08008 A 3 3 0 0 0 243 240 A 3 3 0 0 0 242.12695 237.88672 L 241.25195 118.92383 L 240.70312 43.917969 C 240.70312 43.917969 240.61073 43.677194 240.50586 43.621094 C 240.35586 43.543094 240.18586 43.503906 240.00586 43.503906 L 240 43.5 z M 240 239 A 1 1 0 0 1 241 240 A 1 1 0 0 1 240 241 A 1 1 0 0 1 239 240 A 1 1 0 0 1 240 239 z "
+                id="path4319" />
+        </g>
+    </g>
+</svg>
