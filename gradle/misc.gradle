@@ -9,7 +9,7 @@ buildscript {
     repositories.addRepos()
 
     dependencies {
-        classpath "ca.rmen:lib-french-revolutionary-calendar:$versions.libs.frc"
+        classpath "ca.rmen:lib-french-revolutionary-calendar:$versions.buildLibs.frc"
     }
 }
 
