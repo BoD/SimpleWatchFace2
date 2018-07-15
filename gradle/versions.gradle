@@ -4,11 +4,11 @@ def versions = [:]
 // Plugins
 def plugins = [:]
 plugins.with {
-    androidGradle = '3.3.0-alpha01'
+    androidGradle = '3.3.0-alpha03'
     gradleVersions = '0.20.0'
     fabric = '1.25.4'
     dexCount = '0.8.3'
-    gmsStrictVersionMatcher = '1.0.2'
+    gmsStrictVersionMatcher = '1.0.3'
 }
 versions.plugins = plugins
 
@@ -22,7 +22,7 @@ versions.buildLibs = buildLibs
 // Build parameters
 def build = [:]
 build.with {
-    gradle = '4.8.1'
+    gradle = '4.9-rc-2'
     compileSdk = 27
     targetSdk = 27
     minSdk = 25

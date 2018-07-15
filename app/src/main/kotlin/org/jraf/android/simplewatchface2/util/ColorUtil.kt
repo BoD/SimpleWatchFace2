@@ -35,3 +35,8 @@ inline fun @receiver:ColorInt Int.grayScale(): Int {
     val luminance = (luminance * 255).toInt()
     return Color.rgb(luminance, luminance, luminance)
 }
+
+@ColorInt
+inline fun @receiver:ColorInt Int.withAlpha(alpha: Float): Int {
+    return Color.argb((alpha * 255).toInt(), Color.red(this), Color.green(this), Color.blue(this))
+}

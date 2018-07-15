@@ -36,6 +36,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.os.Bundle
+import android.support.annotation.ColorInt
 import android.support.wearable.complications.ComplicationData
 import android.support.wearable.complications.SystemProviders
 import android.support.wearable.complications.rendering.ComplicationDrawable
@@ -53,6 +54,7 @@ import org.jraf.android.simplewatchface2.prefs.ConfigurationConstants
 import org.jraf.android.simplewatchface2.prefs.ConfigurationPrefs
 import org.jraf.android.simplewatchface2.util.getBitmapFromDrawable
 import org.jraf.android.simplewatchface2.util.tinted
+import org.jraf.android.simplewatchface2.util.withAlpha
 import org.jraf.android.simplewatchface2.util.withShadow
 import org.jraf.android.util.log.Log
 import java.util.Calendar
@@ -136,13 +138,21 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         private var dialRadius = 0F
 
+        @ColorInt
         private var colorBackground = 0
+        @ColorInt
         private var colorHandHour = 0
+        @ColorInt
         private var colorHandMinute = 0
+        @ColorInt
         private var colorHandSecond = 0
+        @ColorInt
         private var colorDial = 0
+        @ColorInt
         private var colorShadow = 0
+        @ColorInt
         private var colorComplicationsBase = 0
+        @ColorInt
         private var colorComplicationsHighlight = 0
 
         private var dialStyle: Configuration.DialStyle = Configuration.DialStyle.valueOf(ConfigurationConstants.DEFAULT_DIAL_STYLE)
@@ -206,6 +216,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             setWatchFaceStyle(
                 WatchFaceStyle.Builder(this@SimpleWatchFaceService)
                     .setAcceptsTapEvents(true)
+                    .setHideNotificationIndicator(true)
+                    .setHideStatusBar(true)
                     .build()
             )
 
@@ -303,7 +315,6 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             ambient = inAmbientMode
 
             updatePaints()
-//            updateBitmaps()
 
             // Complications
             for (complicationDrawable in complicationDrawableById.valueIterator()) {
@@ -339,14 +350,14 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 complicationDrawable.setBackgroundColorActive(resources.getColor(R.color.complication_background, null))
 
                 // Ambient mode
-                complicationDrawable.setBorderColorAmbient(if (complicationSize == ComplicationSize.SMALL) colorComplicationsHighlight else Color.TRANSPARENT)
-                complicationDrawable.setRangedValuePrimaryColorAmbient(colorComplicationsHighlight)
-                complicationDrawable.setTextColorAmbient(colorComplicationsBase)
-                complicationDrawable.setTitleColorAmbient(colorComplicationsBase)
-                complicationDrawable.setIconColorAmbient(colorComplicationsBase)
+                complicationDrawable.setBorderColorAmbient(if (complicationSize == ComplicationSize.SMALL) colorComplicationsHighlight.withAlpha(.5F) else Color.TRANSPARENT)
+                complicationDrawable.setRangedValuePrimaryColorAmbient(colorComplicationsHighlight.withAlpha(.5F))
+                complicationDrawable.setTextColorAmbient(colorComplicationsBase.withAlpha(.5F))
+                complicationDrawable.setTitleColorAmbient(colorComplicationsBase.withAlpha(.5F))
+                complicationDrawable.setIconColorAmbient(colorComplicationsBase.withAlpha(.5F))
                 complicationDrawable.setTextSizeAmbient(resources.getDimensionPixelSize(R.dimen.complication_textSize))
                 complicationDrawable.setTitleSizeAmbient(resources.getDimensionPixelSize(R.dimen.complication_titleSize))
-                complicationDrawable.setBackgroundColorAmbient(resources.getColor(R.color.complication_background, null))
+                complicationDrawable.setBackgroundColorAmbient(resources.getColor(R.color.complication_background, null).withAlpha(.5F))
             }
         }
 
@@ -410,27 +421,37 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         }
 
         private fun initComplications() {
-            val topComplicationDrawable = ComplicationDrawable(this@SimpleWatchFaceService)
+            val topComplicationDrawable = ComplicationDrawable(this@SimpleWatchFaceService).apply {
+                setNoDataText("--")
+            }
             complicationDrawableById[COMPLICATION_ID_TOP] = topComplicationDrawable
             complicationSizeById[COMPLICATION_ID_TOP] = ComplicationSize.SMALL
             setDefaultSystemComplicationProvider(COMPLICATION_ID_TOP, SystemProviders.NEXT_EVENT, ComplicationData.TYPE_LONG_TEXT)
 
-            val rightComplicationDrawable = ComplicationDrawable(this@SimpleWatchFaceService)
+            val rightComplicationDrawable = ComplicationDrawable(this@SimpleWatchFaceService).apply {
+                setNoDataText("--")
+            }
             complicationDrawableById[COMPLICATION_ID_RIGHT] = rightComplicationDrawable
             complicationSizeById[COMPLICATION_ID_RIGHT] = ComplicationSize.SMALL
             setDefaultSystemComplicationProvider(COMPLICATION_ID_RIGHT, SystemProviders.STEP_COUNT, ComplicationData.TYPE_SHORT_TEXT)
 
-            val bottomComplicationDrawable = ComplicationDrawable(this@SimpleWatchFaceService)
+            val bottomComplicationDrawable = ComplicationDrawable(this@SimpleWatchFaceService).apply {
+                setNoDataText("--")
+            }
             complicationDrawableById[COMPLICATION_ID_BOTTOM] = bottomComplicationDrawable
             complicationSizeById[COMPLICATION_ID_BOTTOM] = ComplicationSize.SMALL
             setDefaultSystemComplicationProvider(COMPLICATION_ID_BOTTOM, SystemProviders.DATE, ComplicationData.TYPE_LONG_TEXT)
 
-            val leftComplicationDrawable = ComplicationDrawable(this@SimpleWatchFaceService)
+            val leftComplicationDrawable = ComplicationDrawable(this@SimpleWatchFaceService).apply {
+                setNoDataText("--")
+            }
             complicationDrawableById[COMPLICATION_ID_LEFT] = leftComplicationDrawable
             complicationSizeById[COMPLICATION_ID_LEFT] = ComplicationSize.SMALL
             setDefaultSystemComplicationProvider(COMPLICATION_ID_LEFT, SystemProviders.DAY_OF_WEEK, ComplicationData.TYPE_SHORT_TEXT)
 
-            val backgroundComplicationDrawable = ComplicationDrawable(this@SimpleWatchFaceService)
+            val backgroundComplicationDrawable = ComplicationDrawable(this@SimpleWatchFaceService).apply {
+                setNoDataText("--")
+            }
             backgroundComplicationDrawable.setBorderWidthActive(0)
             backgroundComplicationDrawable.setBorderWidthAmbient(0)
             complicationDrawableById[COMPLICATION_ID_BACKGROUND] = backgroundComplicationDrawable
@@ -512,11 +533,6 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
             if (complicationId == COMPLICATION_ID_BACKGROUND) {
                 hasBackgroundComplication = complicationData.type != ComplicationData.TYPE_EMPTY
-                if (hasBackgroundComplication) {
-                    val drawable = complicationData.largeImage.loadDrawable(this@SimpleWatchFaceService)
-
-
-                }
             }
 
             invalidate()
@@ -663,8 +679,12 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         @Suppress("NOTHING_TO_INLINE")
         private inline fun drawOtherComplications(canvas: Canvas, currentTimeMillis: Long) {
-            if (!ambient) {
-                // Exclude the background complication
+            if (ambient) {
+                // Draw only the top complications
+                val complicationDrawable = complicationDrawableById.get(COMPLICATION_ID_TOP)
+                complicationDrawable.draw(canvas, currentTimeMillis)
+            } else {
+                // Draw all of them, except the background complication
                 for (complicationId in COMPLICATION_IDS.filterNot { it == COMPLICATION_ID_BACKGROUND }) {
                     val complicationDrawable = complicationDrawableById.get(complicationId)
                     complicationDrawable.draw(canvas, currentTimeMillis)
@@ -742,4 +762,3 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
     override fun onCreateEngine() = SimpleWatchFaceEngine()
 }
-

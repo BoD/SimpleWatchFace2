@@ -46,18 +46,16 @@ class MainConfigurationFragment : PreferenceFragment() {
         private val COMPLICATION_TYPES_BACKGROUND = intArrayOf(ComplicationData.TYPE_LARGE_IMAGE)
 
         private val COMPLICATION_TYPES_SMALL = intArrayOf(
-            ComplicationData.TYPE_ICON,
             ComplicationData.TYPE_RANGED_VALUE,
-            ComplicationData.TYPE_SHORT_TEXT,
-            ComplicationData.TYPE_SMALL_IMAGE
+            ComplicationData.TYPE_SHORT_TEXT
         )
 
         private val COMPLICATION_TYPES_BIG = intArrayOf(
             ComplicationData.TYPE_ICON,
             ComplicationData.TYPE_RANGED_VALUE,
             ComplicationData.TYPE_SHORT_TEXT,
-            ComplicationData.TYPE_SMALL_IMAGE,
-            ComplicationData.TYPE_LONG_TEXT
+            ComplicationData.TYPE_LONG_TEXT,
+            ComplicationData.TYPE_SMALL_IMAGE
         )
     }
 
