@@ -8,4 +8,4 @@ Other settings include:
 - colors for all elements
 - dial type (number, dots or ticks)
 
-![Screenshot](/etc/assets/play store/Screenshot_1531663240?raw=true "Screenshot")
+![Screenshot](/etc/assets/play%20store/Screenshot_1531663240.png?raw=true "Screenshot")
