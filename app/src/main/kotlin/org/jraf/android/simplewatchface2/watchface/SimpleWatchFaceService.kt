@@ -54,7 +54,6 @@ import org.jraf.android.simplewatchface2.prefs.ConfigurationConstants
 import org.jraf.android.simplewatchface2.prefs.ConfigurationPrefs
 import org.jraf.android.simplewatchface2.util.getBitmapFromDrawable
 import org.jraf.android.simplewatchface2.util.tinted
-import org.jraf.android.simplewatchface2.util.withAlpha
 import org.jraf.android.simplewatchface2.util.withShadow
 import org.jraf.android.util.log.Log
 import java.util.Calendar
@@ -350,14 +349,14 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 complicationDrawable.setBackgroundColorActive(resources.getColor(R.color.complication_background, null))
 
                 // Ambient mode
-                complicationDrawable.setBorderColorAmbient(if (complicationSize == ComplicationSize.SMALL) colorComplicationsHighlight.withAlpha(.5F) else Color.TRANSPARENT)
-                complicationDrawable.setRangedValuePrimaryColorAmbient(colorComplicationsHighlight.withAlpha(.5F))
-                complicationDrawable.setTextColorAmbient(colorComplicationsBase.withAlpha(.5F))
-                complicationDrawable.setTitleColorAmbient(colorComplicationsBase.withAlpha(.5F))
-                complicationDrawable.setIconColorAmbient(colorComplicationsBase.withAlpha(.5F))
+                complicationDrawable.setBorderColorAmbient(Color.TRANSPARENT)
+                complicationDrawable.setRangedValuePrimaryColorAmbient(Color.WHITE)
+                complicationDrawable.setTextColorAmbient(Color.WHITE)
+                complicationDrawable.setTitleColorAmbient(Color.WHITE)
+                complicationDrawable.setIconColorAmbient(Color.WHITE)
                 complicationDrawable.setTextSizeAmbient(resources.getDimensionPixelSize(R.dimen.complication_textSize))
                 complicationDrawable.setTitleSizeAmbient(resources.getDimensionPixelSize(R.dimen.complication_titleSize))
-                complicationDrawable.setBackgroundColorAmbient(resources.getColor(R.color.complication_background, null).withAlpha(.5F))
+                complicationDrawable.setBackgroundColorAmbient(Color.TRANSPARENT)
             }
         }
 
