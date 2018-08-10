@@ -25,6 +25,7 @@
 package org.jraf.android.simplewatchface2.prefs
 
 import android.graphics.Color
+import org.jraf.android.prefs.DefaultBoolean
 import org.jraf.android.prefs.DefaultInt
 import org.jraf.android.prefs.DefaultString
 import org.jraf.android.prefs.Prefs
@@ -64,4 +65,7 @@ class Configuration {
 
     @DefaultString("TICKS_12")
     var dialStyle: String? = null
+
+    @DefaultBoolean(false)
+    var smartNumbers: Boolean? = false
 }

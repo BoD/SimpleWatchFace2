@@ -1,0 +1,6 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/icon_background_shape" />
+    <item
+        android:drawable="@drawable/ic_palette_white_24dp"
+        android:gravity="center" />
+</layer-list>

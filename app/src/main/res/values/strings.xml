@@ -24,6 +24,7 @@
     <string name="configuration_colors_handSecond">Second hand</string>
     <string name="configuration_colors_dial">Dial</string>
     <string name="configuration_main_dialStyle">Dial</string>
+    <string name="configuration_main_smartNumbers">Smart numbers</string>
     <string name="configuration_colors_complications_base">Complications base</string>
     <string name="configuration_colors_complications_highlight">Complications highlight</string>
     <string name="configuration_main_dialStyle_texts_nothing">Nothing</string>

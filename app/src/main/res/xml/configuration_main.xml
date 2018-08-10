@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="@string/configuration_main_title">
     <PreferenceScreen
-        android:icon="@drawable/ic_palette_white_24dp"
+        android:icon="@drawable/configuration_colors"
         android:title="@string/configuration_colors_title">
 
         <Preference
@@ -36,7 +36,7 @@
     </PreferenceScreen>
 
     <PreferenceScreen
-        android:icon="@drawable/ic_complications_white_24dp"
+        android:icon="@drawable/configuration_complications"
         android:title="@string/configuration_complications_title">
 
         <Preference
@@ -65,12 +65,17 @@
         android:defaultValue="TICKS_12"
         android:entries="@array/configuration_main_dialStyle_texts"
         android:entryValues="@array/configuration_main_dialStyle_values"
-        android:icon="@drawable/ic_dial_white_24dp"
+        android:icon="@drawable/configuration_dial"
         android:key="dialStyle"
         android:title="@string/configuration_main_dialStyle" />
 
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="smartNumbers"
+        android:title="@string/configuration_main_smartNumbers" />
+
     <Preference
-        android:icon="@drawable/ic_info_white_24dp"
+        android:icon="@drawable/configuration_about"
         android:key="about"
         android:title="@string/configuration_main_about" />
 

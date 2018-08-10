@@ -27,6 +27,7 @@ package org.jraf.android.simplewatchface2.configuration.main
 import android.app.Activity
 import android.content.ComponentName
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.preference.PreferenceFragment
@@ -35,6 +36,7 @@ import android.support.wearable.complications.ComplicationHelperActivity
 import org.jraf.android.androidwearcolorpicker.app.ColorPickActivity
 import org.jraf.android.simplewatchface2.BuildConfig
 import org.jraf.android.simplewatchface2.R
+import org.jraf.android.simplewatchface2.prefs.Configuration
 import org.jraf.android.simplewatchface2.prefs.ConfigurationConstants
 import org.jraf.android.simplewatchface2.prefs.ConfigurationPrefs
 import org.jraf.android.simplewatchface2.watchface.SimpleWatchFaceService
@@ -101,7 +103,18 @@ class MainConfigurationFragment : PreferenceFragment() {
             )
             true
         }
+
+        prefs.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
+        onSharedPreferenceChangeListener.onSharedPreferenceChanged(null, null)
     }
+
+    private val onSharedPreferenceChangeListener: SharedPreferences.OnSharedPreferenceChangeListener =
+        SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
+            findPreference(ConfigurationConstants.KEY_SMART_NUMBERS).isEnabled =
+                    prefs.dialStyle == Configuration.DialStyle.NUMBERS_4.name
+                    || prefs.dialStyle == Configuration.DialStyle.NUMBERS_12.name
+        }
+
 
     private fun setComplicationPrefClickListener(prefKey: String, complicationId: Int, supportedTypes: IntArray) {
         findPreference(prefKey).setOnPreferenceClickListener { _ ->
@@ -162,12 +175,17 @@ class MainConfigurationFragment : PreferenceFragment() {
         updateColorPreferences()
     }
 
-    private val mRequestCodes: MutableList<Int> = mutableListOf()
+    private val requestCodes: MutableList<Int> = mutableListOf()
 
     private fun Any.asRequestCode(): Int {
         val hashCode = hashCode()
-        if (!mRequestCodes.contains(hashCode)) mRequestCodes.add(hashCode)
-        return mRequestCodes.indexOf(hashCode)
+        if (!requestCodes.contains(hashCode)) requestCodes.add(hashCode)
+        return requestCodes.indexOf(hashCode)
+    }
+
+    override fun onDestroy() {
+        prefs.unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
+        super.onDestroy()
     }
 }
 
