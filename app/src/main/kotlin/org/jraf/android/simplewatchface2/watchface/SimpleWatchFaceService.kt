@@ -55,7 +55,6 @@ import org.jraf.android.simplewatchface2.prefs.ConfigurationPrefs
 import org.jraf.android.simplewatchface2.util.getBitmapFromDrawable
 import org.jraf.android.simplewatchface2.util.tinted
 import org.jraf.android.simplewatchface2.util.withShadow
-import org.jraf.android.util.log.Log
 import java.util.Calendar
 import java.util.TimeZone
 
@@ -194,23 +193,22 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             getBitmapFromDrawable(this@SimpleWatchFaceService, R.drawable.hand_second, width, height)
         }
 
-
-        private val numberTextBounds: Array<Rect> by lazy {
-            val res = arrayListOf<Rect>()
-            for (numberIndex in 0..11) {
-                val text = if (numberIndex == 0) "12" else numberIndex.toString()
+        // TODO: Reset this if the font changes
+        private val numberTextBounds: Map<String, Rect> by lazy {
+            val res = mutableMapOf<String, Rect>()
+            for (numberIndex in 0..23) {
                 val textSize = if (numberIndex % 3 == 0) numberMajorSize else numberMinorSize
                 paintTick.textSize = textSize
                 val textBounds = Rect()
+                val text = numberIndex.toString()
                 paintTick.getTextBounds(text, 0, text.length, textBounds)
-                res += textBounds
+                res[text] = textBounds
             }
-            res.toTypedArray()
+            res
         }
 
         override fun onCreate(holder: SurfaceHolder?) {
             super.onCreate(holder)
-            Log.d()
 
             setWatchFaceStyle(
                 WatchFaceStyle.Builder(this@SimpleWatchFaceService)
@@ -242,7 +240,6 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
             super.onSurfaceChanged(holder, format, width, height)
-            Log.d()
 
             this.width = width
             this.height = height
@@ -273,13 +270,11 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         override fun onApplyWindowInsets(insets: WindowInsets) {
             super.onApplyWindowInsets(insets)
-            Log.d()
             chinHeight = insets.systemWindowInsetBottom
         }
 
         override fun onPropertiesChanged(properties: Bundle) {
             super.onPropertiesChanged(properties)
-            Log.d()
 
             lowBitAmbient = properties.getBoolean(WatchFaceService.PROPERTY_LOW_BIT_AMBIENT, false)
             burnInProtection = properties.getBoolean(WatchFaceService.PROPERTY_BURN_IN_PROTECTION, false)
@@ -295,7 +290,6 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         override fun onVisibilityChanged(visible: Boolean) {
             super.onVisibilityChanged(visible)
-            Log.d()
 
             if (visible) {
                 registerReceiver()
@@ -310,7 +304,6 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         override fun onAmbientModeChanged(inAmbientMode: Boolean) {
             super.onAmbientModeChanged(inAmbientMode)
-            Log.d()
             ambient = inAmbientMode
 
             updatePaints()
@@ -459,8 +452,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         }
 
         private fun updateComplicationDrawableBounds() {
-            val horizMargin = Math.max(numberTextBounds[3].width(), numberTextBounds[9].width())
-            val vertMargin = Math.max(numberTextBounds[0].height(), numberTextBounds[6].height())
+            val horizMargin = Math.max(numberTextBounds["3"]!!.width(), numberTextBounds["9"]!!.width())
+            val vertMargin = Math.max(numberTextBounds["0"]!!.height(), numberTextBounds["6"]!!.height())
 
             // Left
             val leftCmplWidth = complicationSmallWidth
@@ -552,7 +545,6 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         }
 
         override fun onDraw(canvas: Canvas, bounds: Rect) {
-            Log.d()
             val now = System.currentTimeMillis()
             calendar.timeInMillis = now - now % 1000
 
@@ -641,22 +633,17 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 // Don't draw minor numbers if we only want major ones
                 if (num == 4 && numberIndex % 3 != 0) continue
 
-                val text = if (numberIndex == 0) "12" else numberIndex.toString()
+                val text = getNumberText(numberIndex)
                 val rotation = (numberIndex.toDouble() * Math.PI * 2.0 / num).toFloat()
                 val textSize = if (numberIndex % 3 == 0) numberMajorSize else numberMinorSize
                 paintTick.textSize = textSize
-                val textHeight = numberTextBounds[numberIndex].height()
-//                val textWidth = numberTextBounds[numberIndex].width()
+                val textHeight = numberTextBounds[text]!!.height()
 
                 // Initialize the radius the first time
                 // TODO: Reset this if the font changes
                 if (dialRadius == 0F) {
-//                    // Calculate the radius so the "12" number fits at the highest value in the circle
-//                    val textHalfWidth = textWidth / 2
-//                    dialRadius = centerX - textHeight / 2 - (centerX - Math.sqrt((centerX * centerX - textHalfWidth * textHalfWidth).toDouble())).toFloat()
                     // Calculate the radius using a margin
                     dialRadius = centerX - textHeight / 2 - digitsMarginVertical
-
                 }
 
                 val cx = Math.sin(rotation.toDouble()).toFloat() * dialRadius + centerX
@@ -673,6 +660,20 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                     cy + textHeight / 2,
                     paintTick
                 )
+            }
+        }
+
+        @Suppress("NOTHING_TO_INLINE")
+        private inline fun getNumberText(numberIndex: Int): String {
+            return if (!prefs.isSmartNumbers) {
+                if (numberIndex == 0) "12" else numberIndex.toString()
+            } else {
+                val curHour = calendar[Calendar.HOUR_OF_DAY]
+                if (curHour < 12) {
+                    if (numberIndex < curHour) (numberIndex + 12).toString() else numberIndex.toString()
+                } else {
+                    if (numberIndex < curHour - 12) numberIndex.toString() else (numberIndex + 12).toString()
+                }
             }
         }
 
