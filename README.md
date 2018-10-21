@@ -2,7 +2,7 @@
 A very simple round watchface for Android Wear 2
 
 It supports up to 4 complications.  The top and bottom complications can be small or big, while the left and right ones are small.
-It also supports bitmap notifications for the background.
+It also supports bitmap complications for the background.
 
 Other settings include:
 - colors for all elements
