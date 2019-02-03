@@ -5,7 +5,6 @@ apply plugin: 'com.getkeepsafe.dexcount'
 
 android {
     compileSdkVersion versions.build.compileSdk
-    buildToolsVersion versions.build.tools
 
     defaultConfig {
         applicationId 'org.jraf.android.simplewatchface2'
@@ -88,13 +87,15 @@ android.applicationVariants.all { variant ->
             copyApkToEtc.rename output.outputFileName, apkName
 
             // Copy the apk to the deploy folder
+            def deployFolder = "${buildProperties.deployFolder}/$globalProjectName"
+            mkdir deployFolder
             def copyApkToDeploy = tasks.create("copy${variant.name.capitalize()}ApkToDeploy", Copy)
             copyApkToDeploy.from(outputFile)
-            copyApkToDeploy.into(buildProperties.deployFolder)
+            copyApkToDeploy.into(deployFolder)
             copyApkToDeploy.rename output.outputFileName, apkName
 
             // Make the copy tasks run after the assemble tasks of the variant
-            variant.assemble.finalizedBy(copyApkToEtc, copyApkToDeploy)
+            variant.assembleProvider.get().finalizedBy(copyApkToEtc, copyApkToDeploy)
         }
     }
 }

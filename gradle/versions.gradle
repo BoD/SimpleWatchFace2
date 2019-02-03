@@ -4,11 +4,11 @@ def versions = [:]
 // Plugins
 def plugins = [:]
 plugins.with {
-    androidGradle = '3.3.0-alpha05'
+    androidGradle = '3.3.0'
     gradleVersions = '0.20.0'
     fabric = '1.25.4'
-    dexCount = '0.8.3'
-    gmsStrictVersionMatcher = '1.0.3'
+    dexCount = '0.8.5'
+    gmsStrictVersionMatcher = '1.1.0'
 }
 versions.plugins = plugins
 
@@ -22,11 +22,10 @@ versions.buildLibs = buildLibs
 // Build parameters
 def build = [:]
 build.with {
-    gradle = '4.9'
+    gradle = '5.1.1'
     compileSdk = 28
     targetSdk = 28
     minSdk = 25
-    tools = '28.0.2'
 }
 versions.build = build
 
@@ -42,22 +41,12 @@ versions.testing = testing
 
 // Other dependencies
 versions.with {
-    kotlin = '1.2.60'
-    supportLibrary = '27.1.1'
-    archLifecycle = '1.1.1'
-    archRoom = '1.1.0-rc1'
-    constraintLayout = '1.1.0'
-    playServices = '15.0.1'
-    rxJava = '2.1.13'
-    rxAndroid = '2.0.2'
-    crashlytics = '2.9.2'
-    dagger = '2.15'
-    androidWearable = '2.3.0'
-    prefs = '1.2.2'
-    okHttp = '3.10.0'
-    glide = '4.7.1'
-    jsr250 = '1.0'
-    wearColorPicker = '2.0.0'
+    kotlin = '1.3.20'
+    supportLibrary = '28.0.0'
+    androidWearable = '2.4.0'
+    playServices = '16.0.1'
+    prefs = '1.4.0'
+    wearColorPicker = '2.1.0'
     ktxCore = '0.3'
 }
 

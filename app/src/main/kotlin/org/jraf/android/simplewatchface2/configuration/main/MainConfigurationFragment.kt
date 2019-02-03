@@ -31,6 +31,7 @@ import android.content.SharedPreferences
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.preference.PreferenceFragment
+import android.support.annotation.ColorInt
 import android.support.wearable.complications.ComplicationData
 import android.support.wearable.complications.ComplicationHelperActivity
 import org.jraf.android.androidwearcolorpicker.app.ColorPickActivity
@@ -70,13 +71,13 @@ class MainConfigurationFragment : PreferenceFragment() {
         updateColorPreferences()
 
         // Colors
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_BACKGROUND, prefs.colorBackground)
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_HOUR, prefs.colorHandHour)
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_MINUTE, prefs.colorHandMinute)
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_SECOND, prefs.colorHandSecond)
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_DIAL, prefs.colorDial)
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_COMPLICATIONS_BASE, prefs.colorComplicationsBase)
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_COMPLICATIONS_HIGHLIGHT, prefs.colorComplicationsHighlight)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_BACKGROUND, ConfigurationConstants.DEFAULT_COLOR_BACKGROUND)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_HOUR, ConfigurationConstants.DEFAULT_COLOR_HAND_HOUR)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_MINUTE, ConfigurationConstants.DEFAULT_COLOR_HAND_MINUTE)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_SECOND, ConfigurationConstants.DEFAULT_COLOR_HAND_SECOND)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_DIAL, ConfigurationConstants.DEFAULT_COLOR_DIAL)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_COMPLICATIONS_BASE, ConfigurationConstants.DEFAULT_COLOR_COMPLICATIONS_BASE)
+        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_COMPLICATIONS_HIGHLIGHT, ConfigurationConstants.DEFAULT_COLOR_COMPLICATIONS_HIGHLIGHT)
 
         // Complications
         setComplicationPrefClickListener("complicationBackground", SimpleWatchFaceService.COMPLICATION_ID_BACKGROUND, COMPLICATION_TYPES_BACKGROUND)
@@ -86,7 +87,7 @@ class MainConfigurationFragment : PreferenceFragment() {
         setComplicationPrefClickListener("complicationBottom", SimpleWatchFaceService.COMPLICATION_ID_BOTTOM, COMPLICATION_TYPES_BIG)
 
         // About
-        findPreference("about").setOnPreferenceClickListener { _ ->
+        findPreference("about").setOnPreferenceClickListener {
             startActivity(
                 AboutActivityIntentBuilder()
                     .setAppName(getString(R.string.app_name))
@@ -117,7 +118,7 @@ class MainConfigurationFragment : PreferenceFragment() {
 
 
     private fun setComplicationPrefClickListener(prefKey: String, complicationId: Int, supportedTypes: IntArray) {
-        findPreference(prefKey).setOnPreferenceClickListener { _ ->
+        findPreference(prefKey).setOnPreferenceClickListener {
             startActivity(
                 ComplicationHelperActivity.createProviderChooserHelperIntent(
                     activity,
@@ -133,9 +134,9 @@ class MainConfigurationFragment : PreferenceFragment() {
         }
     }
 
-    private fun setColorPrefClickListener(prefKey: String, color: Int) {
-        findPreference(prefKey).setOnPreferenceClickListener { _ ->
-            val intent = ColorPickActivity.IntentBuilder().oldColor(color).build(context)
+    private fun setColorPrefClickListener(prefKey: String, @ColorInt defaultColor: Int) {
+        findPreference(prefKey).setOnPreferenceClickListener {
+            val intent = ColorPickActivity.IntentBuilder().oldColor(prefs.getInt(prefKey, defaultColor)).build(context)
             startActivityForResult(intent, prefKey.asRequestCode())
             true
         }
@@ -152,7 +153,7 @@ class MainConfigurationFragment : PreferenceFragment() {
 
     }
 
-    private fun updatePrefColor(prefKey: String, color: Int) {
+    private fun updatePrefColor(prefKey: String, @ColorInt color: Int) {
         findPreference(prefKey).icon = (resources.getDrawable(R.drawable.configuration_list_item_color_indicator, null).mutate() as GradientDrawable).apply {
             setColor(color)
         }
