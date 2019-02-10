@@ -7,7 +7,7 @@
  *                              /___/
  * repository.
  *
- * Copyright (C) 2017 Benoit 'BoD' Lubek (BoD@JRAF.org)
+ * Copyright (C) 2017-2019 Benoit 'BoD' Lubek (BoD@JRAF.org)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.os.Bundle
-import android.support.annotation.ColorInt
 import android.support.wearable.complications.ComplicationData
 import android.support.wearable.complications.SystemProviders
 import android.support.wearable.complications.rendering.ComplicationDrawable
@@ -46,6 +45,7 @@ import android.support.wearable.watchface.WatchFaceStyle
 import android.util.SparseArray
 import android.view.SurfaceHolder
 import android.view.WindowInsets
+import androidx.annotation.ColorInt
 import androidx.core.util.set
 import androidx.core.util.valueIterator
 import org.jraf.android.simplewatchface2.R

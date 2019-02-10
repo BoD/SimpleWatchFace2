@@ -107,12 +107,12 @@ dependencies {
     //  Wear
     implementation "com.google.android.support:wearable:$versions.androidWearable"
     compileOnly "com.google.android.wearable:wearable:$versions.androidWearable"
-    implementation "com.android.support:wear:$versions.supportLibrary"
+    implementation "androidx.wear:wear:$versions.androidx"
     implementation "com.google.android.gms:play-services-wearable:$versions.playServices"
 
     // Support library
-    implementation "com.android.support:support-v4:$versions.supportLibrary"
-    implementation "com.android.support:palette-v7:$versions.supportLibrary"
+    implementation "androidx.legacy:legacy-support-v4:$versions.androidx"
+    implementation "androidx.palette:palette:$versions.androidx"
 
     // Ktx
     implementation "androidx.core:core-ktx:$versions.ktxCore"
