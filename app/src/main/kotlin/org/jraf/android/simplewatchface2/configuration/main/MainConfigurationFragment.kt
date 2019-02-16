@@ -111,8 +111,17 @@ class MainConfigurationFragment : PreferenceFragment() {
     private val onSharedPreferenceChangeListener: SharedPreferences.OnSharedPreferenceChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
             findPreference(ConfigurationConstants.KEY_SMART_NUMBERS).isEnabled =
-                    prefs.dialStyle == Configuration.DialStyle.NUMBERS_4.name
-                    || prefs.dialStyle == Configuration.DialStyle.NUMBERS_12.name
+                prefs.dialStyle == Configuration.DialStyle.NUMBERS_4.name
+                        || prefs.dialStyle == Configuration.DialStyle.NUMBERS_12.name
+
+            val autoColors = prefs.colorAuto
+            findPreference(ConfigurationConstants.KEY_COLOR_BACKGROUND).isEnabled = !autoColors
+            findPreference(ConfigurationConstants.KEY_COLOR_HAND_HOUR).isEnabled = !autoColors
+            findPreference(ConfigurationConstants.KEY_COLOR_HAND_MINUTE).isEnabled = !autoColors
+            findPreference(ConfigurationConstants.KEY_COLOR_HAND_SECOND).isEnabled = !autoColors
+            findPreference(ConfigurationConstants.KEY_COLOR_DIAL).isEnabled = !autoColors
+            findPreference(ConfigurationConstants.KEY_COLOR_COMPLICATIONS_BASE).isEnabled = !autoColors
+            findPreference(ConfigurationConstants.KEY_COLOR_COMPLICATIONS_HIGHLIGHT).isEnabled = !autoColors
         }
 
 

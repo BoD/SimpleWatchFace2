@@ -40,3 +40,12 @@ inline fun @receiver:ColorInt Int.grayScale(): Int {
 inline fun @receiver:ColorInt Int.withAlpha(alpha: Float): Int {
     return Color.argb((alpha * 255).toInt(), Color.red(this), Color.green(this), Color.blue(this))
 }
+
+@ColorInt
+inline fun @receiver:ColorInt Int.lighter(): Int {
+    val hsv = floatArrayOf(0f, 0f, 0f)
+    Color.colorToHSV(this, hsv)
+    hsv[2] = 1F
+    hsv[1] = (hsv[1] - .075F).coerceAtLeast(0F)
+    return Color.HSVToColor(hsv)
+}

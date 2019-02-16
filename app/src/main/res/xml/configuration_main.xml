@@ -6,6 +6,11 @@
         android:icon="@drawable/configuration_colors"
         android:title="@string/configuration_colors_title">
 
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="colorAuto"
+            android:title="@string/configuration_colors_auto" />
+
         <Preference
             android:key="colorBackground"
             android:title="@string/configuration_colors_background" />

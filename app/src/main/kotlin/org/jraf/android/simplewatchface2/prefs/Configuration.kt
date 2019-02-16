@@ -42,6 +42,9 @@ class Configuration {
         NUMBERS_12,
     }
 
+    @DefaultBoolean(false)
+    var colorAuto: Boolean? = false
+
     @DefaultInt(0xFF220000.toInt())
     var colorBackground: Int? = null
 

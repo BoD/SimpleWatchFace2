@@ -35,6 +35,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.Typeface
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.support.wearable.complications.ComplicationData
 import android.support.wearable.complications.SystemProviders
@@ -48,11 +49,13 @@ import android.view.WindowInsets
 import androidx.annotation.ColorInt
 import androidx.core.util.set
 import androidx.core.util.valueIterator
+import androidx.palette.graphics.Palette
 import org.jraf.android.simplewatchface2.R
 import org.jraf.android.simplewatchface2.prefs.Configuration
 import org.jraf.android.simplewatchface2.prefs.ConfigurationConstants
 import org.jraf.android.simplewatchface2.prefs.ConfigurationPrefs
 import org.jraf.android.simplewatchface2.util.getBitmapFromDrawable
+import org.jraf.android.simplewatchface2.util.lighter
 import org.jraf.android.simplewatchface2.util.tinted
 import org.jraf.android.simplewatchface2.util.withShadow
 import org.jraf.android.util.log.Log
@@ -207,6 +210,9 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             }
             res
         }
+
+        private var useBackgroundPalette: Boolean = true
+        private var backgroundPalette: Palette? = null
 
         override fun onCreate(holder: SurfaceHolder?) {
             super.onCreate(holder)
@@ -363,6 +369,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             colorComplicationsBase = prefs.colorComplicationsBase
             colorComplicationsHighlight = prefs.colorComplicationsHighlight
             dialStyle = Configuration.DialStyle.valueOf(prefs.dialStyle)
+            useBackgroundPalette = prefs.colorAuto
         }
 
         private fun updatePaints() {
@@ -413,6 +420,19 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 .withShadow(shadowRadius, colorShadow)
         }
 
+        private fun updateColorsWithPalette() {
+            val backgroundPalette = backgroundPalette
+            if (useBackgroundPalette && backgroundPalette != null) {
+                val lightDominantColor = backgroundPalette.getDominantColor(Color.RED).lighter()
+                colorHandHour = Color.WHITE
+                colorHandMinute = Color.WHITE
+                colorHandSecond = lightDominantColor
+                colorDial = lightDominantColor
+                colorComplicationsBase = Color.WHITE
+                colorComplicationsHighlight = lightDominantColor
+            }
+        }
+
         private fun initComplications() {
             val topComplicationDrawable = ComplicationDrawable(this@SimpleWatchFaceService).apply {
                 setNoDataText("--")
@@ -453,8 +473,8 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         }
 
         private fun updateComplicationDrawableBounds() {
-            val horizMargin = Math.max(numberTextBounds["3"]!!.width(), numberTextBounds["9"]!!.width())
-            val vertMargin = Math.max(numberTextBounds["0"]!!.height(), numberTextBounds["6"]!!.height())
+            val horizMargin = Math.max(numberTextBounds.getValue("3").width(), numberTextBounds.getValue("9").width())
+            val vertMargin = Math.max(numberTextBounds.getValue("0").height(), numberTextBounds.getValue("6").height())
 
             // Left
             val leftCmplWidth = complicationSmallWidth
@@ -531,6 +551,17 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                     ComplicationData.TYPE_NO_PERMISSION,
                     ComplicationData.TYPE_NO_DATA
                 )
+                if (hasBackgroundComplication) {
+                    val drawable = complicationData.largeImage.loadDrawable(this@SimpleWatchFaceService)
+                    if (drawable is BitmapDrawable) {
+                        backgroundPalette = Palette.from(drawable.bitmap).generate()
+                        updateColorsWithPalette()
+                        updatePaints()
+                        updateBitmaps()
+                        updateComplicationDrawableColors()
+                        updateTimer()
+                    }
+                }
             }
 
             invalidate()
@@ -643,7 +674,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
                 val rotation = (numberIndex.toDouble() * Math.PI * 2.0 / num).toFloat()
                 val textSize = if (numberIndex % 3 == 0) numberMajorSize else numberMinorSize
                 paintTick.textSize = textSize
-                val textHeight = numberTextBounds[text]!!.height()
+                val textHeight = numberTextBounds.getValue(text).height()
 
                 // Initialize the radius the first time
                 // TODO: Reset this if the font changes
@@ -759,6 +790,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         private val onPrefsChanged = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
             loadPrefs()
+            updateColorsWithPalette()
             updatePaints()
             updateBitmaps()
             updateComplicationDrawableColors()
