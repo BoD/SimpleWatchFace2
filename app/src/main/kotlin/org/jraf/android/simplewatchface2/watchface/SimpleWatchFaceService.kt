@@ -55,6 +55,7 @@ import org.jraf.android.simplewatchface2.prefs.ConfigurationPrefs
 import org.jraf.android.simplewatchface2.util.getBitmapFromDrawable
 import org.jraf.android.simplewatchface2.util.tinted
 import org.jraf.android.simplewatchface2.util.withShadow
+import org.jraf.android.util.log.Log
 import java.util.Calendar
 import java.util.TimeZone
 
@@ -524,7 +525,12 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             updateComplicationDrawableColors()
 
             if (complicationId == COMPLICATION_ID_BACKGROUND) {
-                hasBackgroundComplication = complicationData.type != ComplicationData.TYPE_EMPTY
+                Log.d("Received background complication type=${complicationData.type} size=${complicationSizeById[complicationId]}")
+                hasBackgroundComplication = complicationData.type !in intArrayOf(
+                    ComplicationData.TYPE_EMPTY,
+                    ComplicationData.TYPE_NO_PERMISSION,
+                    ComplicationData.TYPE_NO_DATA
+                )
             }
 
             invalidate()

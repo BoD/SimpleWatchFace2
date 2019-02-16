@@ -46,7 +46,7 @@ versions.with {
     androidWearable = '2.4.0'
     playServices = '16.0.1'
     prefs = '1.4.0'
-    wearColorPicker = '2.1.0'
+    wearColorPicker = '2.2.0'
     ktxCore = '1.0.1'
 }
 

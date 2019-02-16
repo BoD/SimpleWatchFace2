@@ -34,7 +34,7 @@ import android.preference.PreferenceFragment
 import android.support.wearable.complications.ComplicationData
 import android.support.wearable.complications.ComplicationHelperActivity
 import androidx.annotation.ColorInt
-import org.jraf.android.androidwearcolorpicker.app.ColorPickActivity
+import org.jraf.android.androidwearcolorpicker.ColorPickActivity
 import org.jraf.android.simplewatchface2.BuildConfig
 import org.jraf.android.simplewatchface2.R
 import org.jraf.android.simplewatchface2.prefs.Configuration
