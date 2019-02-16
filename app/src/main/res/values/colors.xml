@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="complication_background">#4000</color>
+    <color name="launcherIcon_background">#BB00FF</color>
 </resources>

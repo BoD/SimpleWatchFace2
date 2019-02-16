@@ -3,7 +3,7 @@
     <string name="watchface_name">@string/app_name</string>
 
     <!-- About -->
-    <string name="about_authorCopyright" translatable="false">Copyright (C) 2017-2018 Benoit \'BoD\' Lubek.\nAdditional code/math/ideas/❤️ by Carmen Alvarez</string>
+    <string name="about_authorCopyright" translatable="false">Copyright (C) 2017-present Benoit \'BoD\' Lubek.\nAdditional code/math/ideas/❤️ by Carmen Alvarez</string>
     <string name="about_License" translatable="false">Licensed under the terms of the GNU General Public License.</string>
     <string name="about_email_uri" translatable="false">mailto:BoD@JRAF.org</string>
     <string name="about_email_text">Contact the author</string>
@@ -42,5 +42,6 @@
     <string name="configuration_complications_left">Left</string>
     <string name="configuration_complications_right">Right</string>
     <string name="configuration_complications_bottom">Bottom</string>
+    <string name="complicationProvider_label">Abstract backgrounds</string>
 
 </resources>
