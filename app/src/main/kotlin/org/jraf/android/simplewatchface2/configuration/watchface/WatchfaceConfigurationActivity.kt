@@ -22,15 +22,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jraf.android.simplewatchface2.configuration.main
+package org.jraf.android.simplewatchface2.configuration.watchface
 
 import android.app.Activity
 import android.os.Bundle
 import org.jraf.android.simplewatchface2.R
 
-class MainConfigurationActivity : Activity() {
+class WatchfaceConfigurationActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.configuration_main_activity)
+        setContentView(R.layout.configuration_watchface_activity)
     }
 }

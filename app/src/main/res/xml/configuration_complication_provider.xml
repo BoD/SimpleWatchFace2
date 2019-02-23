@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/configuration_watchface_main_title">
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="randomColor"
+        android:title="@string/configuration_complicationProvider_colors_randomColor" />
+
+    <Preference
+        android:key="color1"
+        android:title="@string/configuration_complicationProvider_colors_color1" />
+
+</PreferenceScreen>

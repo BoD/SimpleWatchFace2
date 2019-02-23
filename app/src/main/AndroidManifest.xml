@@ -16,8 +16,8 @@
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault"
         tools:ignore="GoogleAppIndexingWarning">
@@ -47,7 +47,7 @@
             <!-- Configuration activity -->
             <meta-data
                 android:name="com.google.android.wearable.watchface.wearableConfigurationAction"
-                android:value="org.jraf.android.simplewatchface2.ACTION_CONFIGURATION" />
+                android:value="org.jraf.android.simplewatchface2.ACTION_CONFIGURE_WATCHFACE" />
 
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />
@@ -73,18 +73,34 @@
                 android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS"
                 android:value="18000" />
 
+            <!-- Configuration activity action -->
+            <meta-data
+                android:name="android.support.wearable.complications.PROVIDER_CONFIG_ACTION"
+                android:value="org.jraf.android.simplewatchface2.ACTION_CONFIGURE_COMPLICATION_PROVIDER" />
+
             <intent-filter>
                 <action android:name="android.support.wearable.complications.ACTION_COMPLICATION_UPDATE_REQUEST" />
             </intent-filter>
         </service>
 
-        <!-- Main settings -->
+        <!-- Watchface configuration -->
         <activity
-            android:name=".configuration.main.MainConfigurationActivity">
+            android:name=".configuration.watchface.WatchfaceConfigurationActivity">
             <intent-filter>
-                <action android:name="org.jraf.android.simplewatchface2.ACTION_CONFIGURATION" />
+                <action android:name="org.jraf.android.simplewatchface2.ACTION_CONFIGURE_WATCHFACE" />
 
                 <category android:name="com.google.android.wearable.watchface.category.WEARABLE_CONFIGURATION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Complication provider configuration -->
+        <activity
+            android:name=".configuration.complicationprovider.ComplicationProviderConfigurationActivity">
+            <intent-filter>
+                <action android:name="org.jraf.android.simplewatchface2.ACTION_CONFIGURE_COMPLICATION_PROVIDER" />
+
+                <category android:name="android.support.wearable.complications.category.PROVIDER_CONFIG" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

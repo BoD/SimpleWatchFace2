@@ -14,27 +14,31 @@
     <string name="about_shareText_subject">Checkout out this app!</string>
     <string name="about_shareText_body">This app lists movies showing at your favorite theater, on your watch.\nCheck it out here:\nhttp://play.google.com/store/apps/details?id=%s</string>
 
-    <!-- Configuration -->
-    <string name="configuration_main_title">Configuration</string>
-    <string name="configuration_colors_background">Background</string>
-    <string name="configuration_colors_title">Colors</string>
-    <string name="configuration_main_about">About</string>
-    <string name="configuration_colors_auto">Based on background</string>
-    <string name="configuration_colors_handHour">Hour hand</string>
-    <string name="configuration_colors_handMinute">Minute hand</string>
-    <string name="configuration_colors_handSecond">Second hand</string>
-    <string name="configuration_colors_dial">Dial</string>
-    <string name="configuration_main_dialStyle">Dial</string>
-    <string name="configuration_main_smartNumbers">Smart numbers</string>
-    <string name="configuration_colors_complications_base">Complications base</string>
-    <string name="configuration_colors_complications_highlight">Complications highlight</string>
-    <string name="configuration_main_dialStyle_texts_nothing">Nothing</string>
-    <string name="configuration_main_dialStyle_texts_dots4">4 dots</string>
-    <string name="configuration_main_dialStyle_texts_dots12">12 dots</string>
-    <string name="configuration_main_dialStyle_texts_ticks4">4 ticks</string>
-    <string name="configuration_main_dialStyle_texts_ticks12">12 ticks</string>
-    <string name="configuration_main_dialStyle_texts_numbers4">4 numbers</string>
-    <string name="configuration_main_dialStyle_texts_numbers12">12 numbers</string>
+    <!-- Watchface configuration -->
+    <string name="configuration_watchface_main_title">Configuration</string>
+    <string name="configuration_watchface_colors_background">Background</string>
+    <string name="configuration_watchface_colors_title">Colors</string>
+    <string name="configuration_watchface_main_about">About</string>
+    <string name="configuration_watchface_colors_auto">Based on background</string>
+    <string name="configuration_watchface_colors_handHour">Hour hand</string>
+    <string name="configuration_watchface_colors_handMinute">Minute hand</string>
+    <string name="configuration_watchface_colors_handSecond">Second hand</string>
+    <string name="configuration_watchface_colors_dial">Dial</string>
+    <string name="configuration_watchface_main_dialStyle">Dial</string>
+    <string name="configuration_watchface_main_smartNumbers">Smart numbers</string>
+    <string name="configuration_watchface_colors_complications_base">Complications base</string>
+    <string name="configuration_watchface_colors_complications_highlight">Complications highlight</string>
+    <string name="configuration_watchface_main_dialStyle_texts_nothing">Nothing</string>
+    <string name="configuration_watchface_main_dialStyle_texts_dots4">4 dots</string>
+    <string name="configuration_watchface_main_dialStyle_texts_dots12">12 dots</string>
+    <string name="configuration_watchface_main_dialStyle_texts_ticks4">4 ticks</string>
+    <string name="configuration_watchface_main_dialStyle_texts_ticks12">12 ticks</string>
+    <string name="configuration_watchface_main_dialStyle_texts_numbers4">4 numbers</string>
+    <string name="configuration_watchface_main_dialStyle_texts_numbers12">12 numbers</string>
+
+    <!-- Complication provider configuration -->
+    <string name="configuration_complicationProvider_colors_randomColor">Random color</string>
+    <string name="configuration_complicationProvider_colors_color1">Dominant color</string>
 
     <!-- Complications -->
     <string name="configuration_complications_title">Complications</string>

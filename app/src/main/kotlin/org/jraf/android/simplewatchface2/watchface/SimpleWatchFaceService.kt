@@ -51,11 +51,11 @@ import androidx.core.util.set
 import androidx.core.util.valueIterator
 import androidx.palette.graphics.Palette
 import org.jraf.android.simplewatchface2.R
-import org.jraf.android.simplewatchface2.prefs.Configuration
-import org.jraf.android.simplewatchface2.prefs.ConfigurationConstants
-import org.jraf.android.simplewatchface2.prefs.ConfigurationPrefs
+import org.jraf.android.simplewatchface2.prefs.Watchface
+import org.jraf.android.simplewatchface2.prefs.WatchfaceConstants
+import org.jraf.android.simplewatchface2.prefs.WatchfacePrefs
 import org.jraf.android.simplewatchface2.util.getBitmapFromDrawable
-import org.jraf.android.simplewatchface2.util.lighter
+import org.jraf.android.simplewatchface2.util.saturated
 import org.jraf.android.simplewatchface2.util.tinted
 import org.jraf.android.simplewatchface2.util.withShadow
 import org.jraf.android.util.log.Log
@@ -104,7 +104,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
     }
 
     inner class SimpleWatchFaceEngine : CanvasWatchFaceService.Engine() {
-        private val prefs by lazy { ConfigurationPrefs.get(this@SimpleWatchFaceService) }
+        private val prefs by lazy { WatchfacePrefs.get(this@SimpleWatchFaceService) }
 
         private val updateTimeHandler = EngineHandler(this)
 
@@ -157,7 +157,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         @ColorInt
         private var colorComplicationsHighlight = 0
 
-        private var dialStyle: Configuration.DialStyle = Configuration.DialStyle.valueOf(ConfigurationConstants.DEFAULT_DIAL_STYLE)
+        private var dialStyle: Watchface.DialStyle = Watchface.DialStyle.valueOf(WatchfaceConstants.DEFAULT_DIAL_STYLE)
 
         private val paintHour = Paint()
         private val paintMinute = Paint()
@@ -368,7 +368,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             colorDial = prefs.colorDial
             colorComplicationsBase = prefs.colorComplicationsBase
             colorComplicationsHighlight = prefs.colorComplicationsHighlight
-            dialStyle = Configuration.DialStyle.valueOf(prefs.dialStyle)
+            dialStyle = Watchface.DialStyle.valueOf(prefs.dialStyle)
             useBackgroundPalette = prefs.colorAuto
         }
 
@@ -423,13 +423,13 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         private fun updateColorsWithPalette() {
             val backgroundPalette = backgroundPalette
             if (useBackgroundPalette && backgroundPalette != null) {
-                val lightDominantColor = backgroundPalette.getDominantColor(Color.RED).lighter()
+                val saturatedDominantColor = backgroundPalette.getDominantColor(Color.RED).saturated()
                 colorHandHour = Color.WHITE
                 colorHandMinute = Color.WHITE
-                colorHandSecond = lightDominantColor
-                colorDial = lightDominantColor
+                colorHandSecond = saturatedDominantColor
+                colorDial = saturatedDominantColor
                 colorComplicationsBase = Color.WHITE
-                colorComplicationsHighlight = lightDominantColor
+                colorComplicationsHighlight = saturatedDominantColor
             }
         }
 
@@ -590,14 +590,14 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
             // Dial
             when (dialStyle) {
-                Configuration.DialStyle.DOTS_4 -> drawDots(canvas, 4)
-                Configuration.DialStyle.DOTS_12 -> drawDots(canvas, 12)
-                Configuration.DialStyle.TICKS_4 -> drawTicks(canvas, 4)
-                Configuration.DialStyle.TICKS_12 -> drawTicks(canvas, 12)
-                Configuration.DialStyle.NUMBERS_4 -> drawNumbers(canvas, 4)
-                Configuration.DialStyle.NUMBERS_12 -> drawNumbers(canvas, 12)
+                Watchface.DialStyle.DOTS_4 -> drawDots(canvas, 4)
+                Watchface.DialStyle.DOTS_12 -> drawDots(canvas, 12)
+                Watchface.DialStyle.TICKS_4 -> drawTicks(canvas, 4)
+                Watchface.DialStyle.TICKS_12 -> drawTicks(canvas, 12)
+                Watchface.DialStyle.NUMBERS_4 -> drawNumbers(canvas, 4)
+                Watchface.DialStyle.NUMBERS_12 -> drawNumbers(canvas, 12)
 
-                Configuration.DialStyle.NOTHING -> {
+                Watchface.DialStyle.NOTHING -> {
                     // Do nothing
                 }
             }

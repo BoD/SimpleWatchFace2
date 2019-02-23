@@ -22,7 +22,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.jraf.android.simplewatchface2.configuration.main
+package org.jraf.android.simplewatchface2.configuration.watchface
 
 import android.app.Activity
 import android.content.ComponentName
@@ -37,13 +37,13 @@ import androidx.annotation.ColorInt
 import org.jraf.android.androidwearcolorpicker.ColorPickActivity
 import org.jraf.android.simplewatchface2.BuildConfig
 import org.jraf.android.simplewatchface2.R
-import org.jraf.android.simplewatchface2.prefs.Configuration
-import org.jraf.android.simplewatchface2.prefs.ConfigurationConstants
-import org.jraf.android.simplewatchface2.prefs.ConfigurationPrefs
+import org.jraf.android.simplewatchface2.prefs.Watchface
+import org.jraf.android.simplewatchface2.prefs.WatchfaceConstants
+import org.jraf.android.simplewatchface2.prefs.WatchfacePrefs
 import org.jraf.android.simplewatchface2.watchface.SimpleWatchFaceService
 import org.jraf.android.util.about.AboutActivityIntentBuilder
 
-class MainConfigurationFragment : PreferenceFragment() {
+class WatchfaceConfigurationFragment : PreferenceFragment() {
     companion object {
         private val COMPLICATION_TYPES_BACKGROUND = intArrayOf(ComplicationData.TYPE_LARGE_IMAGE)
 
@@ -61,22 +61,22 @@ class MainConfigurationFragment : PreferenceFragment() {
         )
     }
 
-    private val prefs by lazy { ConfigurationPrefs.get(context) }
+    private val prefs by lazy { WatchfacePrefs.get(context) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        addPreferencesFromResource(R.xml.configuration_main)
+        addPreferencesFromResource(R.xml.configuration_watchface)
 
         updateColorPreferences()
 
         // Colors
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_BACKGROUND, ConfigurationConstants.DEFAULT_COLOR_BACKGROUND)
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_HOUR, ConfigurationConstants.DEFAULT_COLOR_HAND_HOUR)
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_MINUTE, ConfigurationConstants.DEFAULT_COLOR_HAND_MINUTE)
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_HAND_SECOND, ConfigurationConstants.DEFAULT_COLOR_HAND_SECOND)
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_DIAL, ConfigurationConstants.DEFAULT_COLOR_DIAL)
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_COMPLICATIONS_BASE, ConfigurationConstants.DEFAULT_COLOR_COMPLICATIONS_BASE)
-        setColorPrefClickListener(ConfigurationConstants.KEY_COLOR_COMPLICATIONS_HIGHLIGHT, ConfigurationConstants.DEFAULT_COLOR_COMPLICATIONS_HIGHLIGHT)
+        setColorPrefClickListener(WatchfaceConstants.KEY_COLOR_BACKGROUND, WatchfaceConstants.DEFAULT_COLOR_BACKGROUND)
+        setColorPrefClickListener(WatchfaceConstants.KEY_COLOR_HAND_HOUR, WatchfaceConstants.DEFAULT_COLOR_HAND_HOUR)
+        setColorPrefClickListener(WatchfaceConstants.KEY_COLOR_HAND_MINUTE, WatchfaceConstants.DEFAULT_COLOR_HAND_MINUTE)
+        setColorPrefClickListener(WatchfaceConstants.KEY_COLOR_HAND_SECOND, WatchfaceConstants.DEFAULT_COLOR_HAND_SECOND)
+        setColorPrefClickListener(WatchfaceConstants.KEY_COLOR_DIAL, WatchfaceConstants.DEFAULT_COLOR_DIAL)
+        setColorPrefClickListener(WatchfaceConstants.KEY_COLOR_COMPLICATIONS_BASE, WatchfaceConstants.DEFAULT_COLOR_COMPLICATIONS_BASE)
+        setColorPrefClickListener(WatchfaceConstants.KEY_COLOR_COMPLICATIONS_HIGHLIGHT, WatchfaceConstants.DEFAULT_COLOR_COMPLICATIONS_HIGHLIGHT)
 
         // Complications
         setComplicationPrefClickListener("complicationBackground", SimpleWatchFaceService.COMPLICATION_ID_BACKGROUND, COMPLICATION_TYPES_BACKGROUND)
@@ -110,18 +110,18 @@ class MainConfigurationFragment : PreferenceFragment() {
 
     private val onSharedPreferenceChangeListener: SharedPreferences.OnSharedPreferenceChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
-            findPreference(ConfigurationConstants.KEY_SMART_NUMBERS).isEnabled =
-                prefs.dialStyle == Configuration.DialStyle.NUMBERS_4.name
-                        || prefs.dialStyle == Configuration.DialStyle.NUMBERS_12.name
+            findPreference(WatchfaceConstants.KEY_SMART_NUMBERS).isEnabled =
+                prefs.dialStyle == Watchface.DialStyle.NUMBERS_4.name
+                        || prefs.dialStyle == Watchface.DialStyle.NUMBERS_12.name
 
             val autoColors = prefs.colorAuto
-            findPreference(ConfigurationConstants.KEY_COLOR_BACKGROUND).isEnabled = !autoColors
-            findPreference(ConfigurationConstants.KEY_COLOR_HAND_HOUR).isEnabled = !autoColors
-            findPreference(ConfigurationConstants.KEY_COLOR_HAND_MINUTE).isEnabled = !autoColors
-            findPreference(ConfigurationConstants.KEY_COLOR_HAND_SECOND).isEnabled = !autoColors
-            findPreference(ConfigurationConstants.KEY_COLOR_DIAL).isEnabled = !autoColors
-            findPreference(ConfigurationConstants.KEY_COLOR_COMPLICATIONS_BASE).isEnabled = !autoColors
-            findPreference(ConfigurationConstants.KEY_COLOR_COMPLICATIONS_HIGHLIGHT).isEnabled = !autoColors
+            findPreference(WatchfaceConstants.KEY_COLOR_BACKGROUND).isEnabled = !autoColors
+            findPreference(WatchfaceConstants.KEY_COLOR_HAND_HOUR).isEnabled = !autoColors
+            findPreference(WatchfaceConstants.KEY_COLOR_HAND_MINUTE).isEnabled = !autoColors
+            findPreference(WatchfaceConstants.KEY_COLOR_HAND_SECOND).isEnabled = !autoColors
+            findPreference(WatchfaceConstants.KEY_COLOR_DIAL).isEnabled = !autoColors
+            findPreference(WatchfaceConstants.KEY_COLOR_COMPLICATIONS_BASE).isEnabled = !autoColors
+            findPreference(WatchfaceConstants.KEY_COLOR_COMPLICATIONS_HIGHLIGHT).isEnabled = !autoColors
         }
 
 
@@ -151,13 +151,13 @@ class MainConfigurationFragment : PreferenceFragment() {
     }
 
     private fun updateColorPreferences() {
-        updatePrefColor(ConfigurationConstants.KEY_COLOR_BACKGROUND, prefs.colorBackground)
-        updatePrefColor(ConfigurationConstants.KEY_COLOR_HAND_HOUR, prefs.colorHandHour)
-        updatePrefColor(ConfigurationConstants.KEY_COLOR_HAND_MINUTE, prefs.colorHandMinute)
-        updatePrefColor(ConfigurationConstants.KEY_COLOR_HAND_SECOND, prefs.colorHandSecond)
-        updatePrefColor(ConfigurationConstants.KEY_COLOR_DIAL, prefs.colorDial)
-        updatePrefColor(ConfigurationConstants.KEY_COLOR_COMPLICATIONS_BASE, prefs.colorComplicationsBase)
-        updatePrefColor(ConfigurationConstants.KEY_COLOR_COMPLICATIONS_HIGHLIGHT, prefs.colorComplicationsHighlight)
+        updatePrefColor(WatchfaceConstants.KEY_COLOR_BACKGROUND, prefs.colorBackground)
+        updatePrefColor(WatchfaceConstants.KEY_COLOR_HAND_HOUR, prefs.colorHandHour)
+        updatePrefColor(WatchfaceConstants.KEY_COLOR_HAND_MINUTE, prefs.colorHandMinute)
+        updatePrefColor(WatchfaceConstants.KEY_COLOR_HAND_SECOND, prefs.colorHandSecond)
+        updatePrefColor(WatchfaceConstants.KEY_COLOR_DIAL, prefs.colorDial)
+        updatePrefColor(WatchfaceConstants.KEY_COLOR_COMPLICATIONS_BASE, prefs.colorComplicationsBase)
+        updatePrefColor(WatchfaceConstants.KEY_COLOR_COMPLICATIONS_HIGHLIGHT, prefs.colorComplicationsHighlight)
 
     }
 
@@ -173,13 +173,13 @@ class MainConfigurationFragment : PreferenceFragment() {
 
         val pickedColor = data?.getIntExtra(ColorPickActivity.EXTRA_RESULT, 0)
         when (requestCode) {
-            ConfigurationConstants.KEY_COLOR_BACKGROUND.asRequestCode() -> prefs.colorBackground = pickedColor
-            ConfigurationConstants.KEY_COLOR_HAND_HOUR.asRequestCode() -> prefs.colorHandHour = pickedColor
-            ConfigurationConstants.KEY_COLOR_HAND_MINUTE.asRequestCode() -> prefs.colorHandMinute = pickedColor
-            ConfigurationConstants.KEY_COLOR_HAND_SECOND.asRequestCode() -> prefs.colorHandSecond = pickedColor
-            ConfigurationConstants.KEY_COLOR_DIAL.asRequestCode() -> prefs.colorDial = pickedColor
-            ConfigurationConstants.KEY_COLOR_COMPLICATIONS_BASE.asRequestCode() -> prefs.colorComplicationsBase = pickedColor
-            ConfigurationConstants.KEY_COLOR_COMPLICATIONS_HIGHLIGHT.asRequestCode() -> prefs.colorComplicationsHighlight = pickedColor
+            WatchfaceConstants.KEY_COLOR_BACKGROUND.asRequestCode() -> prefs.colorBackground = pickedColor
+            WatchfaceConstants.KEY_COLOR_HAND_HOUR.asRequestCode() -> prefs.colorHandHour = pickedColor
+            WatchfaceConstants.KEY_COLOR_HAND_MINUTE.asRequestCode() -> prefs.colorHandMinute = pickedColor
+            WatchfaceConstants.KEY_COLOR_HAND_SECOND.asRequestCode() -> prefs.colorHandSecond = pickedColor
+            WatchfaceConstants.KEY_COLOR_DIAL.asRequestCode() -> prefs.colorDial = pickedColor
+            WatchfaceConstants.KEY_COLOR_COMPLICATIONS_BASE.asRequestCode() -> prefs.colorComplicationsBase = pickedColor
+            WatchfaceConstants.KEY_COLOR_COMPLICATIONS_HIGHLIGHT.asRequestCode() -> prefs.colorComplicationsHighlight = pickedColor
         }
         updateColorPreferences()
     }

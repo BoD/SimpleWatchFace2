@@ -42,10 +42,18 @@ inline fun @receiver:ColorInt Int.withAlpha(alpha: Float): Int {
 }
 
 @ColorInt
-inline fun @receiver:ColorInt Int.lighter(): Int {
+inline fun @receiver:ColorInt Int.saturated(): Int {
     val hsv = floatArrayOf(0f, 0f, 0f)
     Color.colorToHSV(this, hsv)
+    hsv[1] = 1F
     hsv[2] = 1F
-    hsv[1] = (hsv[1] - .075F).coerceAtLeast(0F)
+    return Color.HSVToColor(hsv)
+}
+
+@ColorInt
+inline fun @receiver:ColorInt Int.darker(): Int {
+    val hsv = floatArrayOf(0f, 0f, 0f)
+    Color.colorToHSV(this, hsv)
+    hsv[2] /= 2F
     return Color.HSVToColor(hsv)
 }

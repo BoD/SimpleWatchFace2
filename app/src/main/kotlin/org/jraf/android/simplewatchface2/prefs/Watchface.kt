@@ -31,7 +31,7 @@ import org.jraf.android.prefs.DefaultString
 import org.jraf.android.prefs.Prefs
 
 @Prefs(useAndroidX = true)
-class Configuration {
+class Watchface {
     enum class DialStyle {
         NOTHING,
         DOTS_4,

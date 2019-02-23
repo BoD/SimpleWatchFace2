@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:title="@string/configuration_main_title">
+    android:title="@string/configuration_watchface_main_title">
     <PreferenceScreen
         android:icon="@drawable/configuration_colors"
-        android:title="@string/configuration_colors_title">
+        android:title="@string/configuration_watchface_colors_title">
 
         <SwitchPreference
             android:defaultValue="false"
             android:key="colorAuto"
-            android:title="@string/configuration_colors_auto" />
+            android:title="@string/configuration_watchface_colors_auto" />
 
         <Preference
             android:key="colorBackground"
-            android:title="@string/configuration_colors_background" />
+            android:title="@string/configuration_watchface_colors_background" />
 
         <Preference
             android:key="colorHandHour"
-            android:title="@string/configuration_colors_handHour" />
+            android:title="@string/configuration_watchface_colors_handHour" />
 
         <Preference
             android:key="colorHandMinute"
-            android:title="@string/configuration_colors_handMinute" />
+            android:title="@string/configuration_watchface_colors_handMinute" />
 
         <Preference
             android:key="colorHandSecond"
-            android:title="@string/configuration_colors_handSecond" />
+            android:title="@string/configuration_watchface_colors_handSecond" />
 
         <Preference
             android:key="colorDial"
-            android:title="@string/configuration_colors_dial" />
+            android:title="@string/configuration_watchface_colors_dial" />
 
         <Preference
             android:key="colorComplicationsBase"
-            android:title="@string/configuration_colors_complications_base" />
+            android:title="@string/configuration_watchface_colors_complications_base" />
 
         <Preference
             android:key="colorComplicationsHighlight"
-            android:title="@string/configuration_colors_complications_highlight" />
+            android:title="@string/configuration_watchface_colors_complications_highlight" />
     </PreferenceScreen>
 
     <PreferenceScreen
@@ -72,16 +72,16 @@
         android:entryValues="@array/configuration_main_dialStyle_values"
         android:icon="@drawable/configuration_dial"
         android:key="dialStyle"
-        android:title="@string/configuration_main_dialStyle" />
+        android:title="@string/configuration_watchface_main_dialStyle" />
 
     <SwitchPreference
         android:defaultValue="false"
         android:key="smartNumbers"
-        android:title="@string/configuration_main_smartNumbers" />
+        android:title="@string/configuration_watchface_main_smartNumbers" />
 
     <Preference
         android:icon="@drawable/configuration_about"
         android:key="about"
-        android:title="@string/configuration_main_about" />
+        android:title="@string/configuration_watchface_main_about" />
 
 </PreferenceScreen>

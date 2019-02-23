@@ -26,16 +26,22 @@ package org.jraf.android.simplewatchface2.complicationprovider
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RadialGradient
 import android.graphics.Shader
 import android.graphics.drawable.Icon
 import android.support.wearable.complications.ComplicationData
 import android.support.wearable.complications.ComplicationManager
+import org.jraf.android.simplewatchface2.prefs.ComplicationProviderPrefs
+import org.jraf.android.simplewatchface2.util.darker
+import org.jraf.android.simplewatchface2.util.saturated
 import kotlin.math.sqrt
 import kotlin.random.Random
 
 class ComplicationProviderService : android.support.wearable.complications.ComplicationProviderService() {
+    private val prefs by lazy { ComplicationProviderPrefs.get(this) }
+
     override fun onComplicationUpdate(complicationId: Int, type: Int, manager: ComplicationManager) {
         if (type != ComplicationData.TYPE_LARGE_IMAGE) {
             // Ignore incompatible types
@@ -55,34 +61,64 @@ class ComplicationProviderService : android.support.wearable.complications.Compl
         val res = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(res)
 
-        // Background
-        drawGradientCircle(
-            canvas,
-            WIDTH.randomFloat(),
-            HEIGHT.randomFloat(),
-            randomColor(),
-            randomColor()
-        )
+        if (!prefs.randomColor) {
+            // Background
+            drawGradientCircle(
+                canvas,
+                WIDTH.randomFloat(),
+                HEIGHT.randomFloat(),
+                prefs.color1.saturated().darker(),
+                prefs.color1.saturated().darker().darker()
+            )
 
-        // Other transparent gradients
-        drawGradientCircle(
-            canvas,
-            WIDTH.randomFloat(),
-            HEIGHT.randomFloat(),
-            randomTransparentColor(),
-            randomTransparentColor()
-        )
-        drawGradientCircle(
-            canvas,
-            WIDTH.randomFloat(),
-            HEIGHT.randomFloat(),
-            randomTransparentColor(),
-            randomTransparentColor()
-        )
+            // Other transparent gradients
+            drawGradientCircle(
+                canvas,
+                WIDTH.randomFloat(),
+                HEIGHT.randomFloat(),
+                randomColor() and 0x38FFFFFF.toInt(),
+                0
+            )
+            drawGradientCircle(
+                canvas,
+                WIDTH.randomFloat(),
+                HEIGHT.randomFloat(),
+                0xE0000000.toInt(),
+                0
+            )
+        } else {
+            // Background
+            drawGradientCircle(
+                canvas,
+                WIDTH.randomFloat(),
+                HEIGHT.randomFloat(),
+                randomColor(),
+                randomColor()
+            )
 
-        // Make it dark
-        canvas.drawColor(0x40000000)
-
+            // Other transparent gradients
+            drawGradientCircle(
+                canvas,
+                WIDTH.randomFloat(),
+                HEIGHT.randomFloat(),
+                randomTransparentColor(),
+                0
+            )
+            drawGradientCircle(
+                canvas,
+                WIDTH.randomFloat(),
+                HEIGHT.randomFloat(),
+                randomTransparentColor(),
+                0
+            )
+            drawGradientCircle(
+                canvas,
+                WIDTH.randomFloat(),
+                HEIGHT.randomFloat(),
+                0xE0000000.toInt(),
+                0
+            )
+        }
         return res
     }
 
@@ -109,11 +145,19 @@ class ComplicationProviderService : android.support.wearable.complications.Compl
         canvas.drawCircle(x, y, WIDTH.toFloat() * sqrt(2F), paint)
     }
 
-    private fun randomColor() = Random.nextInt() or 0xFF000000.toInt()
+    private fun randomColor() = Color.HSVToColor(
+        floatArrayOf(
+            Random.nextFloat(0F, 360F),
+            Random.nextFloat(.5F, 1F),
+            .3F
+        )
+    )
 
     private fun randomTransparencyMask(): Int = (Random.nextInt(0x10, 0x80) shl (8 + 8 + 8)) or 0x00FFFFFF
 
     private fun randomTransparentColor() = randomColor() and randomTransparencyMask()
+
+    private fun Random.Default.nextFloat(from: Float, until: Float): Float = Random.nextDouble(from.toDouble(), until.toDouble()).toFloat()
 
     companion object {
         private const val WIDTH = 64
