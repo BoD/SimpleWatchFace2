@@ -27,13 +27,24 @@ package org.jraf.android.simplewatchface2.prefs
 import android.graphics.Color
 import org.jraf.android.prefs.DefaultBoolean
 import org.jraf.android.prefs.DefaultInt
+import org.jraf.android.prefs.DefaultString
 import org.jraf.android.prefs.Prefs
 
 @Prefs(useAndroidX = true/*, fileName = "complication_provider"*/)
 class ComplicationProvider {
+    enum class Style {
+        CLASSIC,
+        PIXELATED,
+        SQUARES,
+        CIRCLES
+    }
+
     @DefaultBoolean(true)
     var randomColor: Boolean? = true
 
     @DefaultInt(Color.RED)
     var color1: Int? = null
+
+    @DefaultString("CLASSIC")
+    var style: String? = null
 }

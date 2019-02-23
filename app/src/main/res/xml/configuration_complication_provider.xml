@@ -11,4 +11,11 @@
         android:key="color1"
         android:title="@string/configuration_complicationProvider_colors_color1" />
 
+    <ListPreference
+        android:defaultValue="CLASSIC"
+        android:entries="@array/configuration_complicationProvider_style_texts"
+        android:entryValues="@array/configuration_complicationProvider_style_values"
+        android:icon="@drawable/ic_style_white_24dp"
+        android:key="style"
+        android:title="@string/configuration_watchface_style" />
 </PreferenceScreen>

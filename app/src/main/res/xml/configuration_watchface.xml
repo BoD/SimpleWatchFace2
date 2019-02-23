@@ -68,8 +68,8 @@
 
     <ListPreference
         android:defaultValue="TICKS_12"
-        android:entries="@array/configuration_main_dialStyle_texts"
-        android:entryValues="@array/configuration_main_dialStyle_values"
+        android:entries="@array/configuration_watchFace_main_dialStyle_texts"
+        android:entryValues="@array/configuration_watchFace_main_dialStyle_values"
         android:icon="@drawable/configuration_dial"
         android:key="dialStyle"
         android:title="@string/configuration_watchface_main_dialStyle" />

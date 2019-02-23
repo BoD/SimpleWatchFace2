@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="configuration_main_dialStyle_texts">
+    <string-array name="configuration_watchFace_main_dialStyle_texts">
         <item>@string/configuration_watchface_main_dialStyle_texts_nothing</item>
         <item>@string/configuration_watchface_main_dialStyle_texts_dots4</item>
         <item>@string/configuration_watchface_main_dialStyle_texts_dots12</item>
@@ -10,7 +10,7 @@
         <item>@string/configuration_watchface_main_dialStyle_texts_numbers12</item>
     </string-array>
 
-    <string-array name="configuration_main_dialStyle_values">
+    <string-array name="configuration_watchFace_main_dialStyle_values">
         <item>NOTHING</item>
         <item>DOTS_4</item>
         <item>DOTS_12</item>
@@ -18,6 +18,20 @@
         <item>TICKS_12</item>
         <item>NUMBERS_4</item>
         <item>NUMBERS_12</item>
+    </string-array>
+
+    <string-array name="configuration_complicationProvider_style_texts">
+        <item>@string/configuration_watchface_style_texts_classic</item>
+        <item>@string/configuration_watchface_style_texts_pixelated</item>
+        <item>@string/configuration_watchface_style_texts_squares</item>
+        <item>@string/configuration_watchface_style_texts_circles</item>
+    </string-array>
+
+    <string-array name="configuration_complicationProvider_style_values">
+        <item>CLASSIC</item>
+        <item>PIXELATED</item>
+        <item>SQUARES</item>
+        <item>CIRCLES</item>
     </string-array>
 
 </resources>

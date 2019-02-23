@@ -39,6 +39,11 @@
     <!-- Complication provider configuration -->
     <string name="configuration_complicationProvider_colors_randomColor">Random color</string>
     <string name="configuration_complicationProvider_colors_color1">Dominant color</string>
+    <string name="configuration_watchface_style">Style</string>
+    <string name="configuration_watchface_style_texts_classic">Classic</string>
+    <string name="configuration_watchface_style_texts_pixelated">Pixelated</string>
+    <string name="configuration_watchface_style_texts_squares">Squares</string>
+    <string name="configuration_watchface_style_texts_circles">Circles</string>
 
     <!-- Complications -->
     <string name="configuration_complications_title">Complications</string>
