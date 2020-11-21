@@ -34,27 +34,26 @@ import android.preference.PreferenceFragment
 import androidx.annotation.ColorInt
 import org.jraf.android.androidwearcolorpicker.ColorPickActivity
 import org.jraf.android.simplewatchface2.R
-import org.jraf.android.simplewatchface2.prefs.ComplicationProviderConstants
 import org.jraf.android.simplewatchface2.prefs.ComplicationProviderPrefs
 
 class ComplicationProviderConfigurationFragment : PreferenceFragment() {
 
-    private val prefs by lazy { ComplicationProviderPrefs.get(context) }
+    private val prefs by lazy { ComplicationProviderPrefs(context) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         addPreferencesFromResource(R.xml.configuration_complication_provider)
 
         // Colors
-        setColorPrefClickListener(ComplicationProviderConstants.KEY_COLOR1, ComplicationProviderConstants.DEFAULT_COLOR1)
+        setColorPrefClickListener(ComplicationProviderPrefs.KEY_COLOR1, ComplicationProviderPrefs.DEFAULT_COLOR1)
 
-        prefs.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
+        prefs.sharedPreferences.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
         onSharedPreferenceChangeListener.onSharedPreferenceChanged(null, null)
     }
 
     private val onSharedPreferenceChangeListener: SharedPreferences.OnSharedPreferenceChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
-            findPreference(ComplicationProviderConstants.KEY_COLOR1).isEnabled = !prefs.randomColor
+            findPreference(ComplicationProviderPrefs.KEY_COLOR1).isEnabled = !prefs.randomColor
             updateColorPreferences()
         }
 
@@ -62,7 +61,7 @@ class ComplicationProviderConfigurationFragment : PreferenceFragment() {
         findPreference(prefKey).setOnPreferenceClickListener {
             val intent = ColorPickActivity.IntentBuilder()
                 .colors(createListOfColors())
-                .oldColor(prefs.getInt(prefKey, defaultColor))
+                .oldColor(prefs.sharedPreferences.getInt(prefKey, defaultColor))
                 .build(context)
             startActivityForResult(intent, prefKey.asRequestCode())
             true
@@ -79,7 +78,7 @@ class ComplicationProviderConfigurationFragment : PreferenceFragment() {
     }
 
     private fun updateColorPreferences() {
-        updatePrefColor(ComplicationProviderConstants.KEY_COLOR1, if (prefs.randomColor) 0x80B0B0B0.toInt() else prefs.color1)
+        updatePrefColor(ComplicationProviderPrefs.KEY_COLOR1, if (prefs.randomColor) 0x80B0B0B0.toInt() else prefs.color1)
     }
 
     private fun updatePrefColor(prefKey: String, @ColorInt color: Int) {
@@ -92,9 +91,9 @@ class ComplicationProviderConfigurationFragment : PreferenceFragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode != Activity.RESULT_OK) return
 
-        val pickedColor = data?.getIntExtra(ColorPickActivity.EXTRA_RESULT, 0)
+        val pickedColor = data!!.getIntExtra(ColorPickActivity.EXTRA_RESULT, 0)
         when (requestCode) {
-            ComplicationProviderConstants.KEY_COLOR1.asRequestCode() -> prefs.color1 = pickedColor
+            ComplicationProviderPrefs.KEY_COLOR1.asRequestCode() -> prefs.color1 = pickedColor
         }
         updateColorPreferences()
     }
@@ -108,7 +107,7 @@ class ComplicationProviderConfigurationFragment : PreferenceFragment() {
     }
 
     override fun onDestroy() {
-        prefs.unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
+        prefs.sharedPreferences.unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
         super.onDestroy()
     }
 }

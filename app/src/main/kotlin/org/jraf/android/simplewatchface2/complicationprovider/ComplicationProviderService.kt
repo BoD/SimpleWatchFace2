@@ -34,7 +34,6 @@ import android.graphics.drawable.Icon
 import android.support.wearable.complications.ComplicationData
 import android.support.wearable.complications.ComplicationManager
 import androidx.core.graphics.get
-import org.jraf.android.simplewatchface2.prefs.ComplicationProvider
 import org.jraf.android.simplewatchface2.prefs.ComplicationProviderPrefs
 import org.jraf.android.simplewatchface2.util.darker
 import org.jraf.android.simplewatchface2.util.saturated
@@ -42,14 +41,14 @@ import kotlin.math.sqrt
 import kotlin.random.Random
 
 class ComplicationProviderService : android.support.wearable.complications.ComplicationProviderService() {
-    private val prefs by lazy { ComplicationProviderPrefs.get(this) }
-    private val style by lazy { ComplicationProvider.Style.valueOf(prefs.style) }
+    private val prefs by lazy { ComplicationProviderPrefs(this) }
+    private val style by lazy { ComplicationProviderPrefs.Style.valueOf(prefs.style) }
     private val factor by lazy {
         val large = when (style) {
-            ComplicationProvider.Style.CLASSIC -> false
-            ComplicationProvider.Style.PIXELATED -> true
-            ComplicationProvider.Style.SQUARES -> false
-            ComplicationProvider.Style.CIRCLES -> true
+            ComplicationProviderPrefs.Style.CLASSIC -> false
+            ComplicationProviderPrefs.Style.PIXELATED -> true
+            ComplicationProviderPrefs.Style.SQUARES -> false
+            ComplicationProviderPrefs.Style.CIRCLES -> true
         }
         if (large) FACTOR_LARGE else FACTOR_SMALL
     }
@@ -141,7 +140,7 @@ class ComplicationProviderService : android.support.wearable.complications.Compl
     }
 
     private fun drawEffect(bitmap: Bitmap, canvas: Canvas) {
-        if (style == ComplicationProvider.Style.CLASSIC) return
+        if (style == ComplicationProviderPrefs.Style.CLASSIC) return
         val paint = Paint()
         for (iy in 0 until height / gridWidth) {
             for (ix in 0 until width / gridWidth) {
@@ -151,13 +150,13 @@ class ComplicationProviderService : android.support.wearable.complications.Compl
                 paint.color = color
                 @Suppress("NON_EXHAUSTIVE_WHEN")
                 when (style) {
-                    ComplicationProvider.Style.PIXELATED ->
+                    ComplicationProviderPrefs.Style.PIXELATED ->
                         canvas.drawRect(x.toFloat(), y.toFloat(), (x + gridWidth).toFloat(), (y + gridWidth).toFloat(), paint)
 
-                    ComplicationProvider.Style.SQUARES ->
+                    ComplicationProviderPrefs.Style.SQUARES ->
                         canvas.drawRect(x.toFloat(), y.toFloat(), (x + gridWidth - 1).toFloat(), (y + gridWidth - 1).toFloat(), paint)
 
-                    ComplicationProvider.Style.CIRCLES ->
+                    ComplicationProviderPrefs.Style.CIRCLES ->
                         canvas.drawCircle(x.toFloat() + gridWidth / 2F, y.toFloat() + gridWidth / 2F, gridWidth / 2F, paint)
                 }
             }

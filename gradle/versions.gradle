@@ -4,8 +4,8 @@ def versions = [:]
 // Plugins
 def plugins = [:]
 plugins.with {
-    androidGradle = '3.3.1'
-    gradleVersions = '0.20.0'
+    androidGradle = '3.3.2'
+    gradleVersions = '0.21.0'
     fabric = '1.25.4'
     dexCount = '0.8.6'
     gmsStrictVersionMatcher = '1.1.0'
@@ -22,7 +22,7 @@ versions.buildLibs = buildLibs
 // Build parameters
 def build = [:]
 build.with {
-    gradle = '5.2.1'
+    gradle = '5.3.1'
     compileSdk = 28
     targetSdk = 28
     minSdk = 25
@@ -45,9 +45,9 @@ versions.with {
     androidx = '1.0.0'
     androidWearable = '2.4.0'
     playServices = '16.0.1'
-    prefs = '1.4.0'
     wearColorPicker = '2.2.1'
     ktxCore = '1.0.1'
+    kprefs = '1.0.0'
 }
 
 ext.versions = versions

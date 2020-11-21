@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 apply plugin: 'com.getkeepsafe.dexcount'
 
 android {
@@ -117,8 +116,7 @@ dependencies {
     implementation "androidx.core:core-ktx:$versions.ktxCore"
 
     // JRAF
-    kapt "org.jraf:prefs-compiler:$versions.prefs"
-    implementation "org.jraf:prefs:$versions.prefs"
+    implementation "org.jraf:kprefs:$versions.kprefs"
     implementation 'com.github.BoD:jraf-android-util:-SNAPSHOT'
 //    implementation 'org.jraf:jraf-android-util:1.0.0'
     implementation "org.jraf:android-wear-color-picker:$versions.wearColorPicker"
@@ -127,9 +125,4 @@ dependencies {
 // Run './gradlew countReleaseDexMethods' to see dex methods count
 dexcount {
     runOnEachPackage = false
-}
-
-// Necessary for Prefs to work (see https://kotlinlang.org/docs/reference/kapt.html)
-kapt {
-    correctErrorTypes = true
 }

@@ -24,14 +24,18 @@
  */
 package org.jraf.android.simplewatchface2.prefs
 
+import android.content.Context
 import android.graphics.Color
-import org.jraf.android.prefs.DefaultBoolean
-import org.jraf.android.prefs.DefaultInt
-import org.jraf.android.prefs.DefaultString
-import org.jraf.android.prefs.Prefs
+import org.jraf.android.kprefs.Prefs
 
-@Prefs(useAndroidX = true/*, fileName = "complication_provider"*/)
-class ComplicationProvider {
+class ComplicationProviderPrefs(context: Context) {
+    private val prefs = Prefs(context, fileName = "complication_provider")
+    val sharedPreferences = prefs.sharedPreferences
+
+    var randomColor by prefs.Boolean(true)
+    var color1 by prefs.Int(DEFAULT_COLOR1)
+    var style by prefs.String(Style.CLASSIC.name)
+
     enum class Style {
         CLASSIC,
         PIXELATED,
@@ -39,12 +43,9 @@ class ComplicationProvider {
         CIRCLES
     }
 
-    @DefaultBoolean(true)
-    var randomColor: Boolean? = true
+    companion object {
+        const val KEY_COLOR1 = "color1"
 
-    @DefaultInt(Color.RED)
-    var color1: Int? = null
-
-    @DefaultString("CLASSIC")
-    var style: String? = null
+        const val DEFAULT_COLOR1 = Color.RED
+    }
 }

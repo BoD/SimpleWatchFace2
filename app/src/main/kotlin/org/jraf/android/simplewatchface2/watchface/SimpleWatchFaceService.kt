@@ -51,8 +51,6 @@ import androidx.core.util.set
 import androidx.core.util.valueIterator
 import androidx.palette.graphics.Palette
 import org.jraf.android.simplewatchface2.R
-import org.jraf.android.simplewatchface2.prefs.Watchface
-import org.jraf.android.simplewatchface2.prefs.WatchfaceConstants
 import org.jraf.android.simplewatchface2.prefs.WatchfacePrefs
 import org.jraf.android.simplewatchface2.util.getBitmapFromDrawable
 import org.jraf.android.simplewatchface2.util.saturated
@@ -104,7 +102,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
     }
 
     inner class SimpleWatchFaceEngine : CanvasWatchFaceService.Engine() {
-        private val prefs by lazy { WatchfacePrefs.get(this@SimpleWatchFaceService) }
+        private val prefs by lazy { WatchfacePrefs(this@SimpleWatchFaceService) }
 
         private val updateTimeHandler = EngineHandler(this)
 
@@ -157,7 +155,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
         @ColorInt
         private var colorComplicationsHighlight = 0
 
-        private var dialStyle: Watchface.DialStyle = Watchface.DialStyle.valueOf(WatchfaceConstants.DEFAULT_DIAL_STYLE)
+        private var dialStyle: WatchfacePrefs.DialStyle = WatchfacePrefs.DialStyle.valueOf(WatchfacePrefs.DEFAULT_DIAL_STYLE)
 
         private val paintHour = Paint()
         private val paintMinute = Paint()
@@ -242,7 +240,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
             initComplications()
             updateComplicationDrawableColors()
-            prefs.registerOnSharedPreferenceChangeListener(onPrefsChanged)
+            prefs.sharedPreferences.registerOnSharedPreferenceChangeListener(onPrefsChanged)
         }
 
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
@@ -329,7 +327,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         override fun onDestroy() {
             updateTimeHandler.removeCallbacksAndMessages(null)
-            prefs.unregisterOnSharedPreferenceChangeListener(onPrefsChanged)
+            prefs.sharedPreferences.unregisterOnSharedPreferenceChangeListener(onPrefsChanged)
             super.onDestroy()
         }
 
@@ -368,7 +366,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
             colorDial = prefs.colorDial
             colorComplicationsBase = prefs.colorComplicationsBase
             colorComplicationsHighlight = prefs.colorComplicationsHighlight
-            dialStyle = Watchface.DialStyle.valueOf(prefs.dialStyle)
+            dialStyle = WatchfacePrefs.DialStyle.valueOf(prefs.dialStyle)
             useBackgroundPalette = prefs.colorAuto
         }
 
@@ -590,14 +588,14 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
             // Dial
             when (dialStyle) {
-                Watchface.DialStyle.DOTS_4 -> drawDots(canvas, 4)
-                Watchface.DialStyle.DOTS_12 -> drawDots(canvas, 12)
-                Watchface.DialStyle.TICKS_4 -> drawTicks(canvas, 4)
-                Watchface.DialStyle.TICKS_12 -> drawTicks(canvas, 12)
-                Watchface.DialStyle.NUMBERS_4 -> drawNumbers(canvas, 4)
-                Watchface.DialStyle.NUMBERS_12 -> drawNumbers(canvas, 12)
+                WatchfacePrefs.DialStyle.DOTS_4 -> drawDots(canvas, 4)
+                WatchfacePrefs.DialStyle.DOTS_12 -> drawDots(canvas, 12)
+                WatchfacePrefs.DialStyle.TICKS_4 -> drawTicks(canvas, 4)
+                WatchfacePrefs.DialStyle.TICKS_12 -> drawTicks(canvas, 12)
+                WatchfacePrefs.DialStyle.NUMBERS_4 -> drawNumbers(canvas, 4)
+                WatchfacePrefs.DialStyle.NUMBERS_12 -> drawNumbers(canvas, 12)
 
-                Watchface.DialStyle.NOTHING -> {
+                WatchfacePrefs.DialStyle.NOTHING -> {
                     // Do nothing
                 }
             }
@@ -702,7 +700,7 @@ class SimpleWatchFaceService : CanvasWatchFaceService() {
 
         @Suppress("NOTHING_TO_INLINE")
         private inline fun getNumberText(numberIndex: Int): String {
-            return if (!prefs.isSmartNumbers) {
+            return if (!prefs.smartNumbers) {
                 if (numberIndex == 0) "12" else numberIndex.toString()
             } else {
                 val curHour = calendar[Calendar.HOUR_OF_DAY]
